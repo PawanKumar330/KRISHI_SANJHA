@@ -1,0 +1,16 @@
+[
+  {
+    "block": "<BLOCK NAME>",
+    "panchayat": "<PANCHAYAT NAME>",
+    "village": "<VILLAGE NAME>",
+    "ward": null,
+    "tola": null
+  },
+  {
+    "block": "EXAMPLE_BLOCK",
+    "panchayat": "EXAMPLE_PANCHAYAT",
+    "village": "EXAMPLE_VILLAGE",
+    "ward": "Ward 3",
+    "tola": null
+  }
+]
