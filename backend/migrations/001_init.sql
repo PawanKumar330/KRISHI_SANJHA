@@ -38,9 +38,10 @@ CREATE TABLE IF NOT EXISTS admin_village (
   name          TEXT NOT NULL,
   ward          TEXT,
   tola          TEXT,
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT admin_village_uniq UNIQUE (panchayat_id, name, COALESCE(ward, ''), COALESCE(tola, ''))
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE UNIQUE INDEX IF NOT EXISTS admin_village_uniq
+  ON admin_village (panchayat_id, name, COALESCE(ward, ''), COALESCE(tola, ''));
 CREATE INDEX IF NOT EXISTS idx_village_panchayat ON admin_village(panchayat_id);
 
 -- ------------------------------------------------------------- identity
