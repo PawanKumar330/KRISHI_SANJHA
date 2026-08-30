@@ -128,52 +128,90 @@ export const api = {
           }),
 
   register: async (input: RegisterInput): Promise<AuthResponse> => {
-    if (OFFLINE_MODE) return mockCall((m) => m.register(input));
+    if (OFFLINE_MODE) {
+      console.log("[Krishi Sanjha] Registering locally in offline mode");
+      return mockCall((m) => m.register(input));
+    }
 
+    console.log("[Krishi Sanjha] Registering via Supabase Auth:", input.user_id);
     const email = toAuthEmail(input.user_id);
 
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
       password: input.password,
+      options: {
+        data: {
+          user_id: input.user_id,
+          full_name: input.full_name,
+          role: input.role,
+        },
+      },
     });
+
     if (signUpError) {
+      console.error("[Krishi Sanjha] Supabase signUp error:", signUpError);
       if (signUpError.message.toLowerCase().includes("already registered")) {
         throw new ApiError(409, "This User ID is already registered");
       }
       throw new ApiError(0, signUpError.message);
     }
+
     const authUser = signUpData.user;
     if (!authUser) throw new ApiError(0, "Sign up did not return a user");
 
+    // Establish session if not immediately available from signUp
+    let session = signUpData.session;
+    if (!session) {
+      const { data: signInData } = await supabase.auth.signInWithPassword({
+        email,
+        password: input.password,
+      });
+      session = signInData?.session ?? null;
+    }
+
     const { data: profileRow, error: profileError } = await supabase
       .from("profiles")
-      .insert({
-        id: authUser.id,
-        user_id: input.user_id,
-        full_name: input.full_name,
-        role: input.role,
-        account_status: "PENDING_APPROVAL",
-        block_id: input.block_id,
-        panchayat_id: input.panchayat_id ?? null,
-        village_id: input.village_id ?? null,
-        latitude: input.latitude ?? null,
-        longitude: input.longitude ?? null,
-        verifier_role: VERIFIER_OF[input.role],
-      })
+      .upsert(
+        {
+          id: authUser.id,
+          user_id: input.user_id,
+          full_name: input.full_name,
+          role: input.role,
+          account_status: "PENDING_APPROVAL",
+          block_id: input.block_id,
+          panchayat_id: input.panchayat_id ?? null,
+          village_id: input.village_id ?? null,
+          latitude: input.latitude ?? null,
+          longitude: input.longitude ?? null,
+          verifier_role: VERIFIER_OF[input.role],
+        },
+        { onConflict: "id" }
+      )
       .select()
       .single();
-    if (profileError) throw new ApiError(0, profileError.message);
 
-    const token = signUpData.session?.access_token ?? "";
+    if (profileError) {
+      console.error("[Krishi Sanjha] Supabase profiles insert/upsert error:", profileError);
+      throw new ApiError(0, `Database error: ${profileError.message}`);
+    }
+
+    const token = session?.access_token ?? `token.${authUser.id}`;
     return { user: rowToAppUser(profileRow), token };
   },
 
   login: async (user_id: string, password: string): Promise<AuthResponse> => {
-    if (OFFLINE_MODE) return mockCall((m) => m.login(user_id, password));
+    if (OFFLINE_MODE) {
+      console.log("[Krishi Sanjha] Logging in locally in offline mode");
+      return mockCall((m) => m.login(user_id, password));
+    }
 
+    console.log("[Krishi Sanjha] Logging in via Supabase:", user_id);
     const email = toAuthEmail(user_id);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw new ApiError(401, "Invalid User ID or password");
+    if (error) {
+      console.error("[Krishi Sanjha] Supabase signIn error:", error);
+      throw new ApiError(401, "Invalid User ID or password");
+    }
     if (!data.session || !data.user) throw new ApiError(401, "Invalid User ID or password");
 
     const profile = await fetchProfile(data.user.id);
