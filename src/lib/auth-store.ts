@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { api, clearToken, readToken, writeToken } from "./api";
+import { api, clearToken, readToken, writeToken, OFFLINE_MODE } from "./api";
+import { supabase } from "./supabase";
 import type { AppUser } from "./types";
 
 interface AuthState {
@@ -18,11 +19,29 @@ export const useAuth = create<AuthState>((set) => ({
   setUser: (user) => set({ user }),
 
   hydrate: async () => {
-    if (!readToken()) {
-      set({ user: null, ready: true });
+    if (OFFLINE_MODE) {
+      if (!readToken()) {
+        set({ user: null, ready: true });
+        return;
+      }
+      try {
+        const user = await api.me();
+        set({ user, ready: true });
+      } catch {
+        clearToken();
+        set({ user: null, ready: true });
+      }
       return;
     }
+
+    // Online mode: Supabase's own persisted session is the source of truth,
+    // not the local `jamui.token` (which is kept only for interface parity).
     try {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        set({ user: null, ready: true });
+        return;
+      }
       const user = await api.me();
       set({ user, ready: true });
     } catch {
@@ -39,6 +58,13 @@ export const useAuth = create<AuthState>((set) => ({
   },
 
   signOut: () => {
+    if (!OFFLINE_MODE) {
+      // Fire and forget — don't block the UI on network latency, but make
+      // sure the Supabase session is actually terminated server-side too.
+      supabase.auth.signOut().catch(() => {
+        /* session will still be cleared client-side below */
+      });
+    }
     clearToken();
     set({ user: null, ready: true });
   },
