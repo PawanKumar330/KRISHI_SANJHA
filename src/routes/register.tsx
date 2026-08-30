@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { LocationSelect } from "@/components/LocationSelect";
 import { MapPicker, type Coords } from "@/components/MapPicker";
@@ -8,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { useI18n } from "@/lib/i18n";
@@ -56,6 +58,7 @@ function RegisterPage() {
   });
   const [coords, setCoords] = useState<Coords | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const needPanchayat = role !== "DISTRICT_ADMIN";
@@ -63,22 +66,32 @@ function RegisterPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setServerError(null);
+
+    const cleanedUserId = fields.user_id.toLowerCase().trim();
     const parsed = registerSchema.safeParse({
       role,
-      ...fields,
+      full_name: fields.full_name.trim(),
+      user_id: cleanedUserId,
+      password: fields.password,
+      confirm_password: fields.confirm_password,
       block_id: loc.block_id ?? 0,
       panchayat_id: loc.panchayat_id,
       village_id: loc.village_id,
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
     });
+
     if (!parsed.success) {
       const next: Record<string, string> = {};
       for (const issue of parsed.error.issues) next[String(issue.path[0])] = issue.message;
       setErrors(next);
-      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      const firstError = parsed.error.issues[0]?.message ?? "Please check the form";
+      toast.error(firstError);
+      setServerError(firstError);
       return;
     }
+
     setErrors({});
     setBusy(true);
     try {
@@ -90,9 +103,12 @@ function RegisterPage() {
       });
       writeToken(res.token, true);
       setUser(res.user);
+      toast.success("Application submitted successfully!");
       navigate({ to: "/pending", replace: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Registration failed");
+      const msg = err instanceof Error ? err.message : "Registration failed";
+      setServerError(msg);
+      toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -106,6 +122,14 @@ function RegisterPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={onSubmit} className="space-y-6" noValidate>
+            {serverError ? (
+              <Alert variant="destructive">
+                <AlertCircle className="size-4" />
+                <AlertTitle>Registration Note</AlertTitle>
+                <AlertDescription>{serverError}</AlertDescription>
+              </Alert>
+            ) : null}
+
             <fieldset className="space-y-2">
               <legend className="mb-2 text-sm font-medium">{t("role")}</legend>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -135,46 +159,71 @@ function RegisterPage() {
                 <Label htmlFor="full_name">{t("fullName")}</Label>
                 <Input
                   id="full_name"
+                  placeholder="e.g. Ramesh Yadav"
                   value={fields.full_name}
-                  onChange={(e) => setFields({ ...fields, full_name: e.target.value })}
+                  onChange={(e) => {
+                    setFields({ ...fields, full_name: e.target.value });
+                    if (errors["full_name"]) setErrors({ ...errors, full_name: "" });
+                  }}
                 />
                 {errors["full_name"] ? (
                   <p className="text-xs text-destructive">{errors["full_name"]}</p>
                 ) : null}
               </div>
+
               <div className="space-y-1.5">
                 <Label htmlFor="user_id">{t("userId")}</Label>
                 <Input
                   id="user_id"
                   autoComplete="username"
+                  placeholder="e.g. ramesh.kisan"
                   value={fields.user_id}
-                  onChange={(e) => setFields({ ...fields, user_id: e.target.value })}
+                  onChange={(e) => {
+                    setFields({ ...fields, user_id: e.target.value.toLowerCase().replace(/\s+/g, ".") });
+                    if (errors["user_id"]) setErrors({ ...errors, user_id: "" });
+                  }}
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  4-24 chars, start with a letter (e.g. <span className="font-mono text-foreground">ramesh.kisan</span>)
+                </p>
                 {errors["user_id"] ? (
                   <p className="text-xs text-destructive">{errors["user_id"]}</p>
                 ) : null}
               </div>
+
               <div className="space-y-1.5">
                 <Label htmlFor="password">{t("password")}</Label>
                 <Input
                   id="password"
                   type="password"
                   autoComplete="new-password"
+                  placeholder="e.g. kisan@2026"
                   value={fields.password}
-                  onChange={(e) => setFields({ ...fields, password: e.target.value })}
+                  onChange={(e) => {
+                    setFields({ ...fields, password: e.target.value });
+                    if (errors["password"]) setErrors({ ...errors, password: "" });
+                  }}
                 />
+                <p className="text-[11px] text-muted-foreground">
+                  Min 8 chars with a letter & number
+                </p>
                 {errors["password"] ? (
                   <p className="text-xs text-destructive">{errors["password"]}</p>
                 ) : null}
               </div>
-              <div className="space-y-1.5">
+
+              <div className="space-y-1.5 sm:col-span-2">
                 <Label htmlFor="confirm_password">{t("confirmPassword")}</Label>
                 <Input
                   id="confirm_password"
                   type="password"
                   autoComplete="new-password"
+                  placeholder="Re-enter password"
                   value={fields.confirm_password}
-                  onChange={(e) => setFields({ ...fields, confirm_password: e.target.value })}
+                  onChange={(e) => {
+                    setFields({ ...fields, confirm_password: e.target.value });
+                    if (errors["confirm_password"]) setErrors({ ...errors, confirm_password: "" });
+                  }}
                 />
                 {errors["confirm_password"] ? (
                   <p className="text-xs text-destructive">{errors["confirm_password"]}</p>
