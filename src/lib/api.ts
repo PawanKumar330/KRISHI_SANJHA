@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabase, isSupabaseConfigured } from "./supabase";
 import { getMockBackend, persistMockBackend, ApiError, type RegisterInput } from "./mock-backend";
 import { VERIFIER_OF, type AppUser, type AuthResponse, type Block, type Panchayat, type Village } from "./types";
 
@@ -7,7 +7,7 @@ import { VERIFIER_OF, type AppUser, type AuthResponse, type Block, type Panchaya
  * in-memory mock backend (useful for local preview / tests without
  * hitting a real database).
  */
-export const OFFLINE_MODE = !import.meta.env["VITE_SUPABASE_URL"];
+export const OFFLINE_MODE = !isSupabaseConfigured;
 
 /**
  * Bearer-token helpers. Only used by the offline mock backend, which has
