@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from "./supabase";
 import { getMockBackend, persistMockBackend, ApiError, type RegisterInput } from "./mock-backend";
+import { JAMUI_BLOCKS, JAMUI_PANCHAYATS, JAMUI_VILLAGES } from "./jamui";
 import { VERIFIER_OF, type AppUser, type AuthResponse, type Block, type Panchayat, type Village } from "./types";
 
 /**
@@ -89,43 +90,55 @@ async function fetchProfile(authUserId: string): Promise<AppUser> {
 }
 
 export const api = {
-  blocks: (): Promise<Block[]> =>
-    OFFLINE_MODE
-      ? mockCall((m) => m.listBlocks())
-      : supabase
-          .from("admin_blocks")
-          .select("id, name, name_hi")
-          .order("name")
-          .then(({ data, error }) => {
-            if (error) throw new ApiError(0, error.message);
-            return data as Block[];
-          }),
+  blocks: async (): Promise<Block[]> => {
+    if (OFFLINE_MODE) return mockCall((m) => m.listBlocks());
+    try {
+      const { data, error } = await supabase
+        .from("admin_blocks")
+        .select("id, name, name_hi")
+        .order("name");
+      if (error || !data || data.length === 0) {
+        return JAMUI_BLOCKS;
+      }
+      return data as Block[];
+    } catch {
+      return JAMUI_BLOCKS;
+    }
+  },
 
-  panchayats: (blockId: number): Promise<Panchayat[]> =>
-    OFFLINE_MODE
-      ? mockCall((m) => m.listPanchayats(blockId))
-      : supabase
-          .from("admin_panchayats")
-          .select("id, block_id, name")
-          .eq("block_id", blockId)
-          .order("name")
-          .then(({ data, error }) => {
-            if (error) throw new ApiError(0, error.message);
-            return data as Panchayat[];
-          }),
+  panchayats: async (blockId: number): Promise<Panchayat[]> => {
+    if (OFFLINE_MODE) return mockCall((m) => m.listPanchayats(blockId));
+    try {
+      const { data, error } = await supabase
+        .from("admin_panchayats")
+        .select("id, block_id, name")
+        .eq("block_id", blockId)
+        .order("name");
+      if (error || !data || data.length === 0) {
+        return JAMUI_PANCHAYATS.filter((p) => p.block_id === blockId);
+      }
+      return data as Panchayat[];
+    } catch {
+      return JAMUI_PANCHAYATS.filter((p) => p.block_id === blockId);
+    }
+  },
 
-  villages: (panchayatId: number): Promise<Village[]> =>
-    OFFLINE_MODE
-      ? mockCall((m) => m.listVillages(panchayatId))
-      : supabase
-          .from("admin_villages")
-          .select("id, panchayat_id, name, ward, tola")
-          .eq("panchayat_id", panchayatId)
-          .order("name")
-          .then(({ data, error }) => {
-            if (error) throw new ApiError(0, error.message);
-            return data as Village[];
-          }),
+  villages: async (panchayatId: number): Promise<Village[]> => {
+    if (OFFLINE_MODE) return mockCall((m) => m.listVillages(panchayatId));
+    try {
+      const { data, error } = await supabase
+        .from("admin_villages")
+        .select("id, panchayat_id, name, ward, tola")
+        .eq("panchayat_id", panchayatId)
+        .order("name");
+      if (error || !data || data.length === 0) {
+        return JAMUI_VILLAGES.filter((v) => v.panchayat_id === panchayatId);
+      }
+      return data as Village[];
+    } catch {
+      return JAMUI_VILLAGES.filter((v) => v.panchayat_id === panchayatId);
+    }
+  },
 
   register: async (input: RegisterInput): Promise<AuthResponse> => {
     if (OFFLINE_MODE) {
