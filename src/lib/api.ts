@@ -1,14 +1,13 @@
-import { supabase, isSupabaseConfigured } from "./supabase";
+import { supabase } from "./supabase";
 import { getMockBackend, persistMockBackend, ApiError, type RegisterInput } from "./mock-backend";
-import { JAMUI_BLOCKS, JAMUI_PANCHAYATS, JAMUI_VILLAGES } from "./jamui";
-import { VERIFIER_OF, type AppUser, type AuthResponse, type Block, type Panchayat, type Village } from "./types";
+import type { AppUser, AuthResponse, Block, Panchayat, Village } from "./types";
 
 /**
  * True when no Supabase project is configured — falls back to the
  * in-memory mock backend (useful for local preview / tests without
  * hitting a real database).
  */
-export const OFFLINE_MODE = !isSupabaseConfigured;
+export const OFFLINE_MODE = !import.meta.env["VITE_SUPABASE_URL"];
 
 /**
  * Bearer-token helpers. Only used by the offline mock backend, which has
@@ -90,141 +89,84 @@ async function fetchProfile(authUserId: string): Promise<AppUser> {
 }
 
 export const api = {
-  blocks: async (): Promise<Block[]> => {
-    if (OFFLINE_MODE) return mockCall((m) => m.listBlocks());
-    try {
-      const { data, error } = await supabase
-        .from("admin_blocks")
-        .select("id, name, name_hi")
-        .order("name");
-      if (error || !data || data.length === 0) {
-        return JAMUI_BLOCKS;
-      }
-      return data as Block[];
-    } catch {
-      return JAMUI_BLOCKS;
-    }
-  },
+  blocks: (): Promise<Block[]> =>
+    OFFLINE_MODE
+      ? mockCall((m) => m.listBlocks())
+      : supabase
+          .from("admin_blocks")
+          .select("id, name, name_hi")
+          .order("name")
+          .then(({ data, error }) => {
+            if (error) throw new ApiError(0, error.message);
+            return data as Block[];
+          }),
 
-  panchayats: async (blockId: number): Promise<Panchayat[]> => {
-    if (OFFLINE_MODE) return mockCall((m) => m.listPanchayats(blockId));
-    try {
-      const { data, error } = await supabase
-        .from("admin_panchayats")
-        .select("id, block_id, name")
-        .eq("block_id", blockId)
-        .order("name");
-      if (error || !data || data.length === 0) {
-        return JAMUI_PANCHAYATS.filter((p) => p.block_id === blockId);
-      }
-      return data as Panchayat[];
-    } catch {
-      return JAMUI_PANCHAYATS.filter((p) => p.block_id === blockId);
-    }
-  },
+  panchayats: (blockId: number): Promise<Panchayat[]> =>
+    OFFLINE_MODE
+      ? mockCall((m) => m.listPanchayats(blockId))
+      : supabase
+          .from("admin_panchayats")
+          .select("id, block_id, name")
+          .eq("block_id", blockId)
+          .order("name")
+          .then(({ data, error }) => {
+            if (error) throw new ApiError(0, error.message);
+            return data as Panchayat[];
+          }),
 
-  villages: async (panchayatId: number): Promise<Village[]> => {
-    if (OFFLINE_MODE) return mockCall((m) => m.listVillages(panchayatId));
-    try {
-      const { data, error } = await supabase
-        .from("admin_villages")
-        .select("id, panchayat_id, name, ward, tola")
-        .eq("panchayat_id", panchayatId)
-        .order("name");
-      if (error || !data || data.length === 0) {
-        return JAMUI_VILLAGES.filter((v) => v.panchayat_id === panchayatId);
-      }
-      return data as Village[];
-    } catch {
-      return JAMUI_VILLAGES.filter((v) => v.panchayat_id === panchayatId);
-    }
-  },
+  villages: (panchayatId: number): Promise<Village[]> =>
+    OFFLINE_MODE
+      ? mockCall((m) => m.listVillages(panchayatId))
+      : supabase
+          .from("admin_villages")
+          .select("id, panchayat_id, name, ward, tola")
+          .eq("panchayat_id", panchayatId)
+          .order("name")
+          .then(({ data, error }) => {
+            if (error) throw new ApiError(0, error.message);
+            return data as Village[];
+          }),
 
   register: async (input: RegisterInput): Promise<AuthResponse> => {
-    if (OFFLINE_MODE) {
-      console.log("[Krishi Sanjha] Registering locally in offline mode");
-      return mockCall((m) => m.register(input));
-    }
+    if (OFFLINE_MODE) return mockCall((m) => m.register(input));
 
-    console.log("[Krishi Sanjha] Registering via Supabase Auth:", input.user_id);
-    const email = toAuthEmail(input.user_id);
+    // Registration goes through a Supabase Edge Function using the
+    // service_role key server-side. This bypasses the public signup rate
+    // limit entirely and never sends a confirmation email, since the user
+    // is created and confirmed directly via the Admin API.
+    const functionsUrl = `${import.meta.env["VITE_SUPABASE_URL"]}/functions/v1/register-user`;
+    const anonKey = import.meta.env["VITE_SUPABASE_ANON_KEY"];
 
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password: input.password,
-      options: {
-        data: {
-          user_id: input.user_id,
-          full_name: input.full_name,
-          role: input.role,
-        },
+    const res = await fetch(functionsUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${anonKey}`,
       },
+      body: JSON.stringify(input),
     });
 
-    if (signUpError) {
-      console.error("[Krishi Sanjha] Supabase signUp error:", signUpError);
-      if (signUpError.message.toLowerCase().includes("already registered")) {
-        throw new ApiError(409, "This User ID is already registered");
-      }
-      throw new ApiError(0, signUpError.message);
-    }
+    const body = await res.json();
+    if (!res.ok) throw new ApiError(res.status, body.error ?? "Registration failed");
 
-    const authUser = signUpData.user;
-    if (!authUser) throw new ApiError(0, "Sign up did not return a user");
-
-    // Establish session if not immediately available from signUp
-    let session = signUpData.session;
-    if (!session) {
-      const { data: signInData } = await supabase.auth.signInWithPassword({
-        email,
-        password: input.password,
+    // Establish the session on the client so subsequent supabase.auth.getUser()
+    // calls (used by me(), decide(), etc.) see this user as signed in.
+    if (body.session) {
+      await supabase.auth.setSession({
+        access_token: body.session.access_token,
+        refresh_token: body.session.refresh_token,
       });
-      session = signInData?.session ?? null;
     }
 
-    const { data: profileRow, error: profileError } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: authUser.id,
-          user_id: input.user_id,
-          full_name: input.full_name,
-          role: input.role,
-          account_status: "PENDING_APPROVAL",
-          block_id: input.block_id,
-          panchayat_id: input.panchayat_id ?? null,
-          village_id: input.village_id ?? null,
-          latitude: input.latitude ?? null,
-          longitude: input.longitude ?? null,
-          verifier_role: VERIFIER_OF[input.role],
-        },
-        { onConflict: "id" }
-      )
-      .select()
-      .single();
-
-    if (profileError) {
-      console.error("[Krishi Sanjha] Supabase profiles insert/upsert error:", profileError);
-      throw new ApiError(0, `Database error: ${profileError.message}`);
-    }
-
-    const token = session?.access_token ?? `token.${authUser.id}`;
-    return { user: rowToAppUser(profileRow), token };
+    return { user: body.user as AppUser, token: body.token ?? "" };
   },
 
   login: async (user_id: string, password: string): Promise<AuthResponse> => {
-    if (OFFLINE_MODE) {
-      console.log("[Krishi Sanjha] Logging in locally in offline mode");
-      return mockCall((m) => m.login(user_id, password));
-    }
+    if (OFFLINE_MODE) return mockCall((m) => m.login(user_id, password));
 
-    console.log("[Krishi Sanjha] Logging in via Supabase:", user_id);
     const email = toAuthEmail(user_id);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      console.error("[Krishi Sanjha] Supabase signIn error:", error);
-      throw new ApiError(401, "Invalid User ID or password");
-    }
+    if (error) throw new ApiError(401, "Invalid User ID or password");
     if (!data.session || !data.user) throw new ApiError(401, "Invalid User ID or password");
 
     const profile = await fetchProfile(data.user.id);
