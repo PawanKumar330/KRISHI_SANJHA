@@ -49,7 +49,7 @@ export function LocationSelect({
       <div className="space-y-1.5">
         <Label htmlFor="block">{t("block")}</Label>
         <Select
-          value={value.block_id ? String(value.block_id) : undefined}
+          value={value.block_id ? String(value.block_id) : ""}
           onValueChange={(v) =>
             onChange({ block_id: Number(v), panchayat_id: null, village_id: null })
           }
@@ -72,7 +72,7 @@ export function LocationSelect({
         <div className="space-y-1.5">
           <Label htmlFor="panchayat">{t("panchayat")}</Label>
           <Select
-            value={value.panchayat_id ? String(value.panchayat_id) : undefined}
+            value={value.panchayat_id ? String(value.panchayat_id) : ""}
             onValueChange={(v) =>
               onChange({ ...value, panchayat_id: Number(v), village_id: null })
             }
@@ -99,7 +99,7 @@ export function LocationSelect({
         <div className="space-y-1.5 sm:col-span-2">
           <Label htmlFor="village">{t("village")}</Label>
           <Select
-            value={value.village_id ? String(value.village_id) : undefined}
+            value={value.village_id ? String(value.village_id) : ""}
             onValueChange={(v) => onChange({ ...value, village_id: Number(v) })}
             disabled={value.panchayat_id == null}
           >

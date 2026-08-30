@@ -82,8 +82,12 @@ function RegisterPage() {
     setErrors({});
     setBusy(true);
     try {
-      const { confirm_password: _c, ...payload } = parsed.data;
-      const res = await api.register(payload);
+      const { confirm_password: _c, ...rest } = parsed.data;
+      const res = await api.register({
+        ...rest,
+        latitude: rest.latitude ?? null,
+        longitude: rest.longitude ?? null,
+      });
       writeToken(res.token, true);
       setUser(res.user);
       navigate({ to: "/pending", replace: true });
