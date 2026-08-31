@@ -1,157 +1,248 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Coins, Clock, Search, TrendingUp, HandHeart } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { Button } from "@/components/ui/button";
-import { useI18n, type TKey } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Krishi Sanjha — Farm Machinery Sharing in Bihar" },
+      { title: "Krishi Sanjha - Agri-Tech Marketplace" },
       {
         name: "description",
         content:
-          "Krishi Sanjha connects farmers, equipment owners and operators across Bihar. Find nearby tractors and machines, or earn from your idle equipment.",
+          "Empowering farmers through shared access to premium equipment. Build community, reduce costs, and increase yields.",
       },
-      { property: "og:title", content: "Krishi Sanjha — Share Machines. Grow Together." },
+      { property: "og:title", content: "Krishi Sanjha - Agri-Tech Marketplace" },
       {
         property: "og:description",
-        content: "Peer-to-peer farm machinery sharing for rural Bihar, starting with Jamui district.",
+        content: "Revolutionizing Indian Agriculture, One Machine at a Time.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
 });
 
-const PROBLEMS: { icon: typeof Coins; t: TKey; b: TKey }[] = [
-  { icon: Coins, t: "p1t", b: "p1b" },
-  { icon: Clock, t: "p2t", b: "p2b" },
-  { icon: Search, t: "p3t", b: "p3b" },
-  { icon: TrendingUp, t: "p4t", b: "p4b" },
-];
-
-const STEPS: { t: TKey; b: TKey }[] = [
-  { t: "s1t", b: "s1b" },
-  { t: "s2t", b: "s2b" },
-  { t: "s3t", b: "s3b" },
-  { t: "s4t", b: "s4b" },
-];
-
-function FieldArt() {
-  return (
-    <div
-      className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border"
-      aria-hidden
-    >
-      <div className="absolute inset-0 bg-sky" />
-      <div className="absolute right-[12%] top-[12%] size-16 rounded-full bg-accent sm:size-20" />
-      <div className="absolute inset-x-0 bottom-0 h-[62%] rounded-t-[100%_60px] bg-field" />
-      <div className="absolute inset-x-0 bottom-0 h-[42%] bg-primary/80" />
-      <span className="absolute bottom-[38%] left-1/3 text-4xl sm:text-5xl">🚜</span>
-    </div>
-  );
-}
+const HERO_IMAGE_URL =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuAvHSu569E6C1P_p9VWqERBND4ybV-M7t9oA9dp1JkeSikgUIhaNSXVXd2cYTWPi21ul8G68yDYc5OX7hQRgkonJK2cwBxW06RCpfRBazaHk1cRRrQ--dk4ze5DVeHSpkWS-4OAZPPmDMNR-DpgeUrbOqqoVE9IM9OQsf2vTiuGhKf9HwBqmdnzAzj3j8oLps075tm-HbLjsrGE1YyAbG-RCUpQRisGl5MKE757FHtFUZ0FvhfQj9Mh";
 
 function Home() {
-  const { t } = useI18n();
-
   return (
     <AppShell>
-      <section className="grid items-center gap-8 py-4 sm:py-8 lg:grid-cols-2">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-            🌾 {t("heroBadge")}
-          </p>
-          <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-primary sm:text-5xl">
-            {t("heroTitle")}
+      {/* Hero Section */}
+      <section className="relative -mt-20 h-[85vh] min-h-[540px] flex items-center justify-center px-4 md:px-8 overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div
+            className="bg-cover bg-center w-full h-full transform scale-105 transition-transform duration-1000"
+            style={{ backgroundImage: `url('${HERO_IMAGE_URL}')` }}
+          />
+          {/* Dark luxury overlay */}
+          <div className="absolute inset-0 bg-[#082717]/75 backdrop-brightness-90" />
+        </div>
+
+        <div className="relative z-10 text-center max-w-3xl mx-auto flex flex-col items-center gap-6 pt-12">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffcd6d]/20 text-[#ffdea5] text-xs font-semibold tracking-wide border border-[#ffcd6d]/30">
+            🌾 Jamui Farm Equipment Sharing
+          </span>
+          <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+            Revolutionizing Indian Agriculture, One Machine at a Time.
           </h1>
-          <p className="mt-4 max-w-lg text-muted-foreground">{t("heroBody")}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Button size="lg" asChild>
-              <Link to="/register">{t("findEquipment")}</Link>
-            </Button>
-            <Button size="lg" variant="secondary" asChild>
-              <Link to="/register">{t("listEquipment")}</Link>
-            </Button>
+          <p className="text-base sm:text-lg text-[#ebe8e2] max-w-xl leading-relaxed">
+            Empowering farmers through shared access to premium equipment. Build community, reduce costs, and increase yields.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
+            <Link
+              to="/register"
+              className="px-8 py-4 rounded-full bg-gradient-to-r from-[#1f3d2b] to-[#2c4e38] text-white font-medium text-sm sm:text-base shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-white/20"
+            >
+              Explore Marketplace
+            </Link>
+            <Link
+              to="/register"
+              className="px-8 py-4 rounded-full bg-white/10 text-white font-medium text-sm sm:text-base hover:bg-white/20 backdrop-blur-md transition-colors border border-white/30"
+            >
+              List Equipment
+            </Link>
           </div>
-          <div className="mt-6 flex flex-wrap items-center gap-2 text-xs font-semibold">
-            {[t("FARMER"), t("appName"), t("EQUIPMENT_OWNER")].map((label, i) => (
-              <span key={label} className="flex items-center gap-2">
-                {i > 0 && <span className="text-muted-foreground">→</span>}
-                <span className="rounded-full bg-secondary px-3 py-1 text-secondary-foreground">
-                  {label}
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="bg-[#e5e2dc] py-6 px-4 md:px-8 border-b border-[#c2c8c1]/40">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 divide-y md:divide-y-0 md:divide-x divide-[#c2c8c1]/60">
+          <div className="flex items-center gap-4 py-2 md:px-8">
+            <span className="material-symbols-outlined text-[#082717] text-4xl">
+              groups
+            </span>
+            <div>
+              <p className="font-serif text-2xl font-bold text-[#082717]">500+</p>
+              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">Active Farmers</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 py-2 md:px-8">
+            <span className="material-symbols-outlined text-[#082717] text-4xl">
+              precision_manufacturing
+            </span>
+            <div>
+              <p className="font-serif text-2xl font-bold text-[#082717]">200+</p>
+              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">Machines Verified</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 py-2 md:px-8">
+            <span className="material-symbols-outlined text-[#082717] text-4xl">
+              location_on
+            </span>
+            <div>
+              <p className="font-serif text-2xl font-bold text-[#082717]">10 Blocks</p>
+              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">Jamui District Coverage</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 px-4 md:px-8 max-w-7xl mx-auto scroll-mt-20">
+        <div className="text-center mb-16">
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#082717] mb-3">
+            Seamless Equipment Sharing
+          </h2>
+          <p className="text-[#424843] max-w-lg mx-auto text-base">
+            Access the tools you need, when you need them, with our trusted community platform.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Step 1 */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm hover:-translate-y-1.5 transition-all duration-300 border border-[#c2c8c1]/30 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
+              <span className="material-symbols-outlined text-3xl">search</span>
+            </div>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">1. Browse</h3>
+            <p className="text-sm text-[#424843]">
+              Find local, verified agricultural equipment ready for deployment.
+            </p>
+          </div>
+
+          {/* Step 2 */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm hover:-translate-y-1.5 transition-all duration-300 border border-[#c2c8c1]/30 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
+              <span className="material-symbols-outlined text-3xl">calendar_month</span>
+            </div>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">2. Book</h3>
+            <p className="text-sm text-[#424843]">
+              Reserve machines instantly with transparent, upfront pricing.
+            </p>
+          </div>
+
+          {/* Step 3 */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm hover:-translate-y-1.5 transition-all duration-300 border border-[#c2c8c1]/30 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
+              <span className="material-symbols-outlined text-3xl">handshake</span>
+            </div>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">3. Share & Earn</h3>
+            <p className="text-sm text-[#424843]">
+              List your idle machinery to generate reliable secondary income.
+            </p>
+          </div>
+
+          {/* Step 4 */}
+          <div className="bg-white p-8 rounded-2xl shadow-sm hover:-translate-y-1.5 transition-all duration-300 border border-[#c2c8c1]/30 flex flex-col items-center text-center">
+            <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
+              <span className="material-symbols-outlined text-3xl">verified_user</span>
+            </div>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">4. Secure</h3>
+            <p className="text-sm text-[#424843]">
+              Rest easy with administrative verification and transparent community ratings.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Marketplace Highlights / Categories */}
+      <section id="categories" className="bg-[#f6f3ed] py-20 px-4 md:px-8 border-y border-[#c2c8c1]/30 scroll-mt-20">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
+            <div>
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#082717] mb-2">
+                Featured Categories
+              </h2>
+              <p className="text-[#424843] text-base">
+                Explore top-tier equipment tailored for modern farming needs in Jamui.
+              </p>
+            </div>
+            <Link
+              to="/register"
+              className="inline-flex items-center px-6 py-2.5 rounded-full border border-[#082717] text-[#082717] text-sm font-medium hover:bg-[#082717]/5 transition-colors"
+            >
+              View All Machinery
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {/* Category 1 */}
+            <Link to="/register" className="group cursor-pointer">
+              <div className="bg-white rounded-2xl p-8 mb-3 shadow-sm flex items-center justify-center group-hover:shadow-md group-hover:-translate-y-1 transition-all duration-200 border border-[#c2c8c1]/20">
+                <span className="material-symbols-outlined text-[#082717] text-5xl opacity-85 group-hover:scale-110 transition-transform">
+                  agriculture
                 </span>
-              </span>
-            ))}
+              </div>
+              <h4 className="text-base font-semibold text-[#082717] text-center">Tractors & Trollies</h4>
+            </Link>
+
+            {/* Category 2 */}
+            <Link to="/register" className="group cursor-pointer">
+              <div className="bg-white rounded-2xl p-8 mb-3 shadow-sm flex items-center justify-center group-hover:shadow-md group-hover:-translate-y-1 transition-all duration-200 border border-[#c2c8c1]/20">
+                <span className="material-symbols-outlined text-[#082717] text-5xl opacity-85 group-hover:scale-110 transition-transform">
+                  grass
+                </span>
+              </div>
+              <h4 className="text-base font-semibold text-[#082717] text-center">Harvesters & Thrashers</h4>
+            </Link>
+
+            {/* Category 3 */}
+            <Link to="/register" className="group cursor-pointer">
+              <div className="bg-white rounded-2xl p-8 mb-3 shadow-sm flex items-center justify-center group-hover:shadow-md group-hover:-translate-y-1 transition-all duration-200 border border-[#c2c8c1]/20">
+                <span className="material-symbols-outlined text-[#082717] text-5xl opacity-85 group-hover:scale-110 transition-transform">
+                  water_drop
+                </span>
+              </div>
+              <h4 className="text-base font-semibold text-[#082717] text-center">Irrigation & Pumps</h4>
+            </Link>
+
+            {/* Category 4 */}
+            <Link to="/register" className="group cursor-pointer">
+              <div className="bg-white rounded-2xl p-8 mb-3 shadow-sm flex items-center justify-center group-hover:shadow-md group-hover:-translate-y-1 transition-all duration-200 border border-[#c2c8c1]/20">
+                <span className="material-symbols-outlined text-[#082717] text-5xl opacity-85 group-hover:scale-110 transition-transform">
+                  build
+                </span>
+              </div>
+              <h4 className="text-base font-semibold text-[#082717] text-center">Implements & Rotavators</h4>
+            </Link>
           </div>
         </div>
-        <FieldArt />
       </section>
 
-      <section className="py-10">
-        <h2 className="text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-          {t("problemTitle")}
-        </h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {PROBLEMS.map(({ icon: Icon, t: title, b }) => (
-            <div key={title} className="rounded-xl border border-border bg-card p-5">
-              <div className="flex items-center gap-2 font-semibold">
-                <Icon className="size-4 text-primary" aria-hidden />
-                {t(title)}
-              </div>
-              <p className="mt-2 text-sm text-muted-foreground">{t(b)}</p>
-            </div>
-          ))}
+      {/* CTA Section */}
+      <section className="py-20 px-4 md:px-8 max-w-6xl mx-auto text-center">
+        <div className="bg-[#ffcd6d] rounded-3xl p-10 md:p-20 shadow-md relative overflow-hidden">
+          <div className="relative z-10 flex flex-col items-center gap-4">
+            <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#785600] leading-tight">
+              Ready to Modernize Your Farm?
+            </h2>
+            <p className="text-base sm:text-lg text-[#785600]/90 max-w-xl mb-4">
+              Join hundreds of progressive farmers utilizing Krishi Sanjha to optimize their operations and increase profitability.
+            </p>
+            <Link
+              to="/register"
+              className="px-9 py-4 rounded-full bg-[#082717] text-white font-medium text-base shadow-lg hover:bg-[#1f3d2b] transition-all duration-200 hover:scale-105"
+            >
+              Get Started Today
+            </Link>
+          </div>
+          {/* Subtle ambient blur shapes */}
+          <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#7b5800]/15 rounded-full blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-white/40 rounded-full blur-3xl" />
         </div>
-      </section>
-
-      <section className="-mx-4 bg-cream px-4 py-10 sm:rounded-2xl sm:px-8">
-        <h2 className="text-2xl font-bold tracking-tight text-primary sm:text-3xl">
-          {t("howTitle")}
-        </h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map(({ t: title, b }, i) => (
-            <div key={title} className="rounded-xl border border-border bg-card p-5">
-              <span className="grid size-8 place-items-center rounded-full bg-secondary text-sm font-semibold text-secondary-foreground">
-                {i + 1}
-              </span>
-              <h3 className="mt-3 font-semibold">{t(title)}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{t(b)}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-8 rounded-2xl border border-border bg-gradient-to-r from-secondary to-cream p-6 sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-          {t("ownersLabel")}
-        </p>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-xl font-bold tracking-tight text-primary sm:text-2xl">
-            {t("ownersTitle")}
-          </h2>
-          <Button asChild>
-            <Link to="/register">{t("listEquipment")}</Link>
-          </Button>
-        </div>
-        <p className="mt-3 text-sm text-muted-foreground">{t("ownersBody")}</p>
-      </section>
-
-      <section className="mt-6 mb-4 rounded-2xl border border-border bg-gradient-to-r from-cream to-secondary p-6 sm:p-8">
-        <span className="grid size-10 place-items-center rounded-full bg-card">
-          <HandHeart className="size-5 text-primary" aria-hidden />
-        </span>
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-xl font-bold tracking-tight text-primary sm:text-2xl">
-            {t("saathiTitle")}
-          </h2>
-          <Button variant="default" asChild>
-            <Link to="/login">{t("saathiCta")}</Link>
-          </Button>
-        </div>
-        <p className="mt-3 text-sm text-muted-foreground">{t("saathiBody")}</p>
       </section>
     </AppShell>
   );
