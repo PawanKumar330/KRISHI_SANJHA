@@ -231,6 +231,7 @@ function RegisterPage() {
   }
 
   const isLastStep = (role === "FARMER" && step === 2) || (role !== "FARMER" && step === 3);
+  const RoleIcon = selectedRole?.icon ?? User;
 
   return (
     <AppShell>
@@ -256,7 +257,7 @@ function RegisterPage() {
               Complete this form to register. Your application will be reviewed by your local Grameen Mitra within 2–5 working days.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
-              {[["Shield", "Aadhaar-linked verification"], ["CheckCircle2", "Free to register"], ["MapPin", "Jamui District only"]].map(([_, label]) => (
+              {["Aadhaar-linked verification", "Free to register", "Jamui District only"].map((label) => (
                 <span key={label} className="inline-flex items-center gap-1 bg-white/10 border border-white/20 rounded-full px-3 py-1 text-xs">
                   <Shield className="w-3 h-3" /> {label}
                 </span>
@@ -370,7 +371,7 @@ function RegisterPage() {
                   </FormField>
                 </div>
                 <div className="sm:col-span-2 flex items-center justify-between p-3 rounded-xl bg-[#f6f3ed] border border-[#c2c8c1]/40">
-                  {selectedRole && (() => { const RoleIcon = selectedRole.icon; return <RoleIcon className="w-4 h-4 text-[#1f3d2b] mr-2" />; })()}
+                  {selectedRole && <RoleIcon className="w-4 h-4 text-[#1f3d2b] mr-2" />}
                   <span className="text-sm text-[#082717]">Registering as: <strong>{selectedRole?.label}</strong></span>
                   <button type="button" onClick={() => setStep(0)} className="text-xs text-[#7b5800] underline ml-auto">Change</button>
                 </div>
@@ -765,5 +766,4 @@ function RegisterPage() {
       </div>
     </AppShell>
   );
-};
 }
