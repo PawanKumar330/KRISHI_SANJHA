@@ -370,7 +370,7 @@ function RegisterPage() {
                   </FormField>
                 </div>
                 <div className="sm:col-span-2 flex items-center justify-between p-3 rounded-xl bg-[#f6f3ed] border border-[#c2c8c1]/40">
-                  {selectedRole && <selectedRole.icon className="w-4 h-4 text-[#1f3d2b] mr-2" />}
+                  {selectedRole && (() => { const RoleIcon = selectedRole.icon; return <RoleIcon className="w-4 h-4 text-[#1f3d2b] mr-2" />; })()}
                   <span className="text-sm text-[#082717]">Registering as: <strong>{selectedRole?.label}</strong></span>
                   <button type="button" onClick={() => setStep(0)} className="text-xs text-[#7b5800] underline ml-auto">Change</button>
                 </div>
