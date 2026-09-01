@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -25,6 +26,8 @@ const HERO_IMAGE_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuAvHSu569E6C1P_p9VWqERBND4ybV-M7t9oA9dp1JkeSikgUIhaNSXVXd2cYTWPi21ul8G68yDYc5OX7hQRgkonJK2cwBxW06RCpfRBazaHk1cRRrQ--dk4ze5DVeHSpkWS-4OAZPPmDMNR-DpgeUrbOqqoVE9IM9OQsf2vTiuGhKf9HwBqmdnzAzj3j8oLps075tm-HbLjsrGE1YyAbG-RCUpQRisGl5MKE757FHtFUZ0FvhfQj9Mh";
 
 function Home() {
+  const { t } = useI18n();
+
   return (
     <AppShell>
       {/* Hero Section */}
@@ -40,26 +43,26 @@ function Home() {
 
         <div className="relative z-10 text-center max-w-3xl mx-auto flex flex-col items-center gap-6 pt-12">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffcd6d]/20 text-[#ffdea5] text-xs font-semibold tracking-wide border border-[#ffcd6d]/30">
-            🌾 Jamui Farm Equipment Sharing
+            🌾 {t("heroBadgeHome")}
           </span>
           <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-            Revolutionizing Indian Agriculture, One Machine at a Time.
+            {t("heroTitleHome")}
           </h1>
           <p className="text-base sm:text-lg text-[#ebe8e2] max-w-xl leading-relaxed">
-            Empowering farmers through shared access to premium equipment. Build community, reduce costs, and increase yields.
+            {t("heroBodyHome")}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 mt-2">
             <Link
               to="/register"
               className="px-8 py-4 rounded-full bg-gradient-to-r from-[#1f3d2b] to-[#2c4e38] text-white font-medium text-sm sm:text-base shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 border border-white/20"
             >
-              Explore Marketplace
+              {t("exploreMarketplace")}
             </Link>
             <Link
               to="/register"
               className="px-8 py-4 rounded-full bg-white/10 text-white font-medium text-sm sm:text-base hover:bg-white/20 backdrop-blur-md transition-colors border border-white/30"
             >
-              List Equipment
+              {t("listEquipmentBtn")}
             </Link>
           </div>
         </div>
@@ -74,7 +77,7 @@ function Home() {
             </span>
             <div>
               <p className="font-serif text-2xl font-bold text-[#082717]">500+</p>
-              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">Active Farmers</p>
+              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">{t("activeFarmers")}</p>
             </div>
           </div>
 
@@ -84,7 +87,7 @@ function Home() {
             </span>
             <div>
               <p className="font-serif text-2xl font-bold text-[#082717]">200+</p>
-              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">Machines Verified</p>
+              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">{t("machinesVerified")}</p>
             </div>
           </div>
 
@@ -93,8 +96,8 @@ function Home() {
               location_on
             </span>
             <div>
-              <p className="font-serif text-2xl font-bold text-[#082717]">10 Blocks</p>
-              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">Jamui District Coverage</p>
+              <p className="font-serif text-2xl font-bold text-[#082717]">{t("tenBlocks")}</p>
+              <p className="text-xs uppercase tracking-wider text-[#424843] font-semibold">{t("districtCoverage")}</p>
             </div>
           </div>
         </div>
@@ -104,10 +107,10 @@ function Home() {
       <section id="how-it-works" className="py-20 px-4 md:px-8 max-w-7xl mx-auto scroll-mt-20">
         <div className="text-center mb-16">
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#082717] mb-3">
-            Seamless Equipment Sharing
+            {t("seamlessTitle")}
           </h2>
           <p className="text-[#424843] max-w-lg mx-auto text-base">
-            Access the tools you need, when you need them, with our trusted community platform.
+            {t("seamlessBody")}
           </p>
         </div>
 
@@ -117,9 +120,9 @@ function Home() {
             <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
               <span className="material-symbols-outlined text-3xl">search</span>
             </div>
-            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">1. Browse</h3>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">{t("step1Title")}</h3>
             <p className="text-sm text-[#424843]">
-              Find local, verified agricultural equipment ready for deployment.
+              {t("step1Body")}
             </p>
           </div>
 
@@ -128,9 +131,9 @@ function Home() {
             <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
               <span className="material-symbols-outlined text-3xl">calendar_month</span>
             </div>
-            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">2. Book</h3>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">{t("step2Title")}</h3>
             <p className="text-sm text-[#424843]">
-              Reserve machines instantly with transparent, upfront pricing.
+              {t("step2Body")}
             </p>
           </div>
 
@@ -139,9 +142,9 @@ function Home() {
             <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
               <span className="material-symbols-outlined text-3xl">handshake</span>
             </div>
-            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">3. Share & Earn</h3>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">{t("step3Title")}</h3>
             <p className="text-sm text-[#424843]">
-              List your idle machinery to generate reliable secondary income.
+              {t("step3Body")}
             </p>
           </div>
 
@@ -150,9 +153,9 @@ function Home() {
             <div className="w-16 h-16 rounded-full bg-[#f0eee8] flex items-center justify-center mb-5 text-[#7b5800]">
               <span className="material-symbols-outlined text-3xl">verified_user</span>
             </div>
-            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">4. Secure</h3>
+            <h3 className="font-serif text-xl font-bold text-[#082717] mb-2">{t("step4Title")}</h3>
             <p className="text-sm text-[#424843]">
-              Rest easy with administrative verification and transparent community ratings.
+              {t("step4Body")}
             </p>
           </div>
         </div>
@@ -164,17 +167,17 @@ function Home() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4">
             <div>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#082717] mb-2">
-                Featured Categories
+                {t("featuredCategories")}
               </h2>
               <p className="text-[#424843] text-base">
-                Explore top-tier equipment tailored for modern farming needs in Jamui.
+                {t("categoriesBody")}
               </p>
             </div>
             <Link
               to="/register"
               className="inline-flex items-center px-6 py-2.5 rounded-full border border-[#082717] text-[#082717] text-sm font-medium hover:bg-[#082717]/5 transition-colors"
             >
-              View All Machinery
+              {t("viewAllMachinery")}
             </Link>
           </div>
 
@@ -186,7 +189,7 @@ function Home() {
                   agriculture
                 </span>
               </div>
-              <h4 className="text-base font-semibold text-[#082717] text-center">Tractors & Trollies</h4>
+              <h4 className="text-base font-semibold text-[#082717] text-center">{t("cat1")}</h4>
             </Link>
 
             {/* Category 2 */}
@@ -196,7 +199,7 @@ function Home() {
                   grass
                 </span>
               </div>
-              <h4 className="text-base font-semibold text-[#082717] text-center">Harvesters & Thrashers</h4>
+              <h4 className="text-base font-semibold text-[#082717] text-center">{t("cat2")}</h4>
             </Link>
 
             {/* Category 3 */}
@@ -206,7 +209,7 @@ function Home() {
                   water_drop
                 </span>
               </div>
-              <h4 className="text-base font-semibold text-[#082717] text-center">Irrigation & Pumps</h4>
+              <h4 className="text-base font-semibold text-[#082717] text-center">{t("cat3")}</h4>
             </Link>
 
             {/* Category 4 */}
@@ -216,7 +219,7 @@ function Home() {
                   build
                 </span>
               </div>
-              <h4 className="text-base font-semibold text-[#082717] text-center">Implements & Rotavators</h4>
+              <h4 className="text-base font-semibold text-[#082717] text-center">{t("cat4")}</h4>
             </Link>
           </div>
         </div>
@@ -227,16 +230,16 @@ function Home() {
         <div className="bg-[#ffcd6d] rounded-3xl p-10 md:p-20 shadow-md relative overflow-hidden">
           <div className="relative z-10 flex flex-col items-center gap-4">
             <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#785600] leading-tight">
-              Ready to Modernize Your Farm?
+              {t("ctaTitle")}
             </h2>
             <p className="text-base sm:text-lg text-[#785600]/90 max-w-xl mb-4">
-              Join hundreds of progressive farmers utilizing Krishi Sanjha to optimize their operations and increase profitability.
+              {t("ctaBody")}
             </p>
             <Link
               to="/register"
               className="px-9 py-4 rounded-full bg-[#082717] text-white font-medium text-base shadow-lg hover:bg-[#1f3d2b] transition-all duration-200 hover:scale-105"
             >
-              Get Started Today
+              {t("ctaBtn")}
             </Link>
           </div>
           {/* Subtle ambient blur shapes */}

@@ -33,19 +33,19 @@ export function AppShell({ children }: { children: ReactNode }) {
               to="/"
               className="text-sm font-medium text-[#7b5800] relative after:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-[#7b5800] after:rounded-full"
             >
-              Marketplace
+              {t("marketplace")}
             </Link>
             <a
               href="/#how-it-works"
               className="text-sm font-medium text-[#424843] hover:text-[#082717] transition-colors"
             >
-              How It Works
+              {t("howItWorksNav")}
             </a>
             <a
               href="/#categories"
               className="text-sm font-medium text-[#424843] hover:text-[#082717] transition-colors"
             >
-              Categories
+              {t("categoriesNav")}
             </a>
 
             <Button
@@ -62,7 +62,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {user ? (
               <div className="flex items-center gap-3">
                 <Button variant="outline" size="sm" asChild className="rounded-full">
-                  <Link to="/dashboard">Dashboard</Link>
+                  <Link to="/dashboard">{t("dashboard")}</Link>
                 </Button>
                 <Button
                   variant="ghost"
@@ -87,7 +87,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   asChild
                   className="rounded-full bg-gradient-to-r from-[#1f3d2b] to-[#466551] text-white hover:shadow-md transition-shadow"
                 >
-                  <Link to="/register">Get Started</Link>
+                  <Link to="/register">{t("getStarted")}</Link>
                 </Button>
               </div>
             )}
@@ -122,28 +122,28 @@ export function AppShell({ children }: { children: ReactNode }) {
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-sm font-medium text-[#7b5800]"
               >
-                Marketplace
+                {t("marketplace")}
               </Link>
               <a
                 href="/#how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-sm font-medium text-[#424843]"
               >
-                How It Works
+                {t("howItWorksNav")}
               </a>
               <a
                 href="/#categories"
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-sm font-medium text-[#424843]"
               >
-                Categories
+                {t("categoriesNav")}
               </a>
               <div className="pt-2 border-t border-[#c2c8c1]/30 flex flex-col gap-2">
                 {user ? (
                   <>
                     <Button variant="outline" size="sm" asChild className="w-full">
                       <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                        Dashboard
+                        {t("dashboard")}
                       </Link>
                     </Button>
                     <Button
@@ -169,7 +169,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </Button>
                     <Button size="sm" asChild className="w-full bg-[#1f3d2b] text-white">
                       <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-                        Get Started
+                        {t("getStarted")}
                       </Link>
                     </Button>
                   </>
@@ -193,36 +193,34 @@ export function AppShell({ children }: { children: ReactNode }) {
               </span>
               <span className="font-serif text-xl font-bold text-[#082717]">Krishi Sanjha</span>
             </div>
-            <p className="text-xs text-[#424843]">
-              © 2024 Krishi Sanjha. Bridging Tradition with Technology.
-            </p>
+            <p className="text-xs text-[#424843]">{t("copyright")}</p>
             {OFFLINE_MODE ? (
               <p className="mt-2 text-[11px] text-[#7b5800]">{t("offlineNote")}</p>
             ) : null}
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-bold text-[#082717] mb-1">Platform</p>
+            <p className="text-sm font-bold text-[#082717] mb-1">{t("platform")}</p>
             <Link to="/register" className="text-sm text-[#424843] hover:text-[#7b5800] transition-colors">
-              Machine Listing
+              {t("machineListing")}
             </Link>
             <Link to="/login" className="text-sm text-[#424843] hover:text-[#7b5800] transition-colors">
-              Farmer Support
+              {t("farmerSupport")}
             </Link>
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-bold text-[#082717] mb-1">Legal</p>
+            <p className="text-sm font-bold text-[#082717] mb-1">{t("legal")}</p>
             <span className="text-sm text-[#424843] hover:text-[#7b5800] cursor-pointer transition-colors">
-              Privacy Policy
+              {t("privacyPolicy")}
             </span>
             <span className="text-sm text-[#424843] hover:text-[#7b5800] cursor-pointer transition-colors">
-              Terms of Service
+              {t("termsOfService")}
             </span>
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-bold text-[#082717] mb-1">Connect</p>
+            <p className="text-sm font-bold text-[#082717] mb-1">{t("connect")}</p>
             <span className="text-sm text-[#424843] hover:text-[#7b5800] cursor-pointer transition-colors">
               Contact Us: info@krishisanjha.in
             </span>

@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 import { getMockBackend, persistMockBackend, ApiError, type RegisterInput } from "./mock-backend";
-import type { AppUser, AuthResponse, Block, Panchayat, Village } from "./types";
+import type { AppUser, AuthResponse, Block, LandPlot, Machine, Panchayat, Village } from "./types";
 
 /**
  * True when no Supabase project is configured — falls back to the
@@ -89,43 +89,34 @@ async function fetchProfile(authUserId: string): Promise<AppUser> {
 }
 
 export const api = {
-  blocks: (): Promise<Block[]> =>
-    OFFLINE_MODE
-      ? mockCall((m) => m.listBlocks())
-      : supabase
-          .from("admin_blocks")
-          .select("id, name, name_hi")
-          .order("name")
-          .then(({ data, error }) => {
-            if (error) throw new ApiError(0, error.message);
-            return data as Block[];
-          }),
+  blocks: async (): Promise<Block[]> => {
+    if (OFFLINE_MODE) return mockCall((m) => m.listBlocks());
+    const { data, error } = await supabase.from("admin_blocks").select("id, name, name_hi").order("name");
+    if (error) throw new ApiError(0, error.message);
+    return data as Block[];
+  },
 
-  panchayats: (blockId: number): Promise<Panchayat[]> =>
-    OFFLINE_MODE
-      ? mockCall((m) => m.listPanchayats(blockId))
-      : supabase
-          .from("admin_panchayats")
-          .select("id, block_id, name")
-          .eq("block_id", blockId)
-          .order("name")
-          .then(({ data, error }) => {
-            if (error) throw new ApiError(0, error.message);
-            return data as Panchayat[];
-          }),
+  panchayats: async (blockId: number): Promise<Panchayat[]> => {
+    if (OFFLINE_MODE) return mockCall((m) => m.listPanchayats(blockId));
+    const { data, error } = await supabase
+      .from("admin_panchayats")
+      .select("id, block_id, name")
+      .eq("block_id", blockId)
+      .order("name");
+    if (error) throw new ApiError(0, error.message);
+    return data as Panchayat[];
+  },
 
-  villages: (panchayatId: number): Promise<Village[]> =>
-    OFFLINE_MODE
-      ? mockCall((m) => m.listVillages(panchayatId))
-      : supabase
-          .from("admin_villages")
-          .select("id, panchayat_id, name, ward, tola")
-          .eq("panchayat_id", panchayatId)
-          .order("name")
-          .then(({ data, error }) => {
-            if (error) throw new ApiError(0, error.message);
-            return data as Village[];
-          }),
+  villages: async (panchayatId: number): Promise<Village[]> => {
+    if (OFFLINE_MODE) return mockCall((m) => m.listVillages(panchayatId));
+    const { data, error } = await supabase
+      .from("admin_villages")
+      .select("id, panchayat_id, name, ward, tola")
+      .eq("panchayat_id", panchayatId)
+      .order("name");
+    if (error) throw new ApiError(0, error.message);
+    return data as Village[];
+  },
 
   register: async (input: RegisterInput): Promise<AuthResponse> => {
     if (OFFLINE_MODE) return mockCall((m) => m.register(input));
@@ -258,6 +249,95 @@ export const api = {
     const { error } = await supabase.from("profiles").update(payload).eq("id", authUserId);
     if (error) throw new ApiError(0, error.message);
     return { ok: true };
+  },
+
+  /** The signed-in farmer's land plots (Bihar Bigha/Katha units). */
+  landPlots: async (): Promise<LandPlot[]> => {
+    if (OFFLINE_MODE) return [];
+
+    const authUserId = await currentSessionUserId();
+    const { data, error } = await supabase
+      .from("land_records")
+      .select("id, plot_name, land_area_bigha, land_area_katha, soil_type, latitude, longitude")
+      .eq("user_id", authUserId)
+      .order("created_at", { ascending: false });
+    if (error) throw new ApiError(0, error.message);
+    return (data ?? []).map((row: any) => ({
+      id: row.id,
+      plot_name: row.plot_name ?? "",
+      bigha: Number(row.land_area_bigha ?? 0),
+      katha: Number(row.land_area_katha ?? 0),
+      dhur: 0,
+      soil_type: row.soil_type ?? "",
+      latitude: row.latitude,
+      longitude: row.longitude,
+    }));
+  },
+
+  /** Save a new land plot for the signed-in farmer. */
+  addLandPlot: async (input: {
+    plot_name: string;
+    bigha: number;
+    katha: number;
+    soil_type: string;
+    village_id?: number | null;
+  }): Promise<LandPlot> => {
+    if (OFFLINE_MODE) {
+      return mockCall((m) => {
+        const db = m as any;
+        if (typeof db.addLandPlot === "function") return db.addLandPlot(input);
+        return { id: crypto.randomUUID(), ...input, dhur: 0 } as LandPlot;
+      });
+    }
+
+    const authUserId = await currentSessionUserId();
+    const { data, error } = await supabase
+      .from("land_records")
+      .insert({
+        user_id: authUserId,
+        plot_name: input.plot_name,
+        land_area_bigha: input.bigha,
+        land_area_katha: input.katha,
+        soil_type: input.soil_type || null,
+        village_id: input.village_id ?? null,
+      })
+      .select("id, plot_name, land_area_bigha, land_area_katha, soil_type, latitude, longitude")
+      .single();
+    if (error) throw new ApiError(0, error.message);
+    return {
+      id: data.id,
+      plot_name: data.plot_name ?? "",
+      bigha: Number(data.land_area_bigha ?? 0),
+      katha: Number(data.land_area_katha ?? 0),
+      dhur: 0,
+      soil_type: data.soil_type ?? "",
+      latitude: data.latitude,
+      longitude: data.longitude,
+    };
+  },
+
+  /** Active machinery listings visible to any signed-in user. */
+  equipmentList: async (): Promise<Machine[]> => {
+    if (OFFLINE_MODE) return [];
+
+    const { data, error } = await supabase
+      .from("equipment")
+      .select("id, category, sub_category, make_model, hp_rating, base_hourly_rate, base_acre_rate, photos")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new ApiError(0, error.message);
+    return (data ?? []).map((row: any) => ({
+      id: row.id,
+      category: row.category,
+      sub_category: row.sub_category ?? undefined,
+      make_model: row.make_model ?? "",
+      hp_rating: row.hp_rating != null ? Number(row.hp_rating) : undefined,
+      hourly_rate: row.base_hourly_rate != null ? Number(row.base_hourly_rate) : undefined,
+      acre_rate: row.base_acre_rate != null ? Number(row.base_acre_rate) : undefined,
+      implements: [],
+      photos: Array.isArray(row.photos) ? row.photos : [],
+    })) as Machine[];
   },
 };
 
