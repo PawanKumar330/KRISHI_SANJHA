@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { MapPin, Navigation, Phone } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-store";
 import { useI18n } from "@/lib/i18n";
 import { routeForUser } from "@/lib/routing";
-import { SOIL_TYPES, normalizeArea } from "@/lib/schemas";
+import { PHONE_RE, SOIL_TYPES, normalizeArea } from "@/lib/schemas";
 import type { AppUser } from "@/lib/types";
 
 export const Route = createFileRoute("/dashboard")({
@@ -35,6 +36,20 @@ export const Route = createFileRoute("/dashboard")({
   }),
   component: DashboardPage,
 });
+
+function getGpsCoords(): Promise<{ lat: number; lng: number }> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("geolocation unavailable"));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (err) => reject(err),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60_000 },
+    );
+  });
+}
 
 function DashboardPage() {
   const { t } = useI18n();
@@ -63,6 +78,8 @@ function DashboardPage() {
       </AppShell>
     );
   }
+
+  const isFarmer = user.role === "FARMER";
 
   return (
     <AppShell>
@@ -94,20 +111,37 @@ function DashboardPage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <ProfileCard user={user} />
 
-          {user.role === "FARMER" ? (
+          {isFarmer ? (
             <>
               <LandPlotsCard userId={user.id} villageId={user.village_id} />
-              <MachineryCard />
+              <NearestOwnersCard />
             </>
           ) : null}
         </div>
+
+        {isFarmer ? <MachineryCard /> : null}
       </div>
     </AppShell>
   );
 }
 
+/** Saves a profile patch, then refreshes the signed-in user in the auth store. */
+async function persistProfile(patch: Record<string, unknown>): Promise<void> {
+  await api.saveProfile(patch);
+  const me = await api.me();
+  useAuth.getState().setUser(me);
+}
+
 function ProfileCard({ user }: { user: AppUser }) {
   const { t, lang } = useI18n();
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [busyGps, setBusyGps] = useState(false);
+  const [draft, setDraft] = useState({
+    phone: user.phone ?? "",
+    father_name: user.father_name ?? "",
+    aadhaar_last4: user.aadhaar_last4 ?? "",
+  });
 
   const { data: block } = useQuery({
     queryKey: ["dash-block", user.block_id],
@@ -142,29 +176,248 @@ function ProfileCard({ user }: { user: AppUser }) {
   );
 
   const location = [villageName, panchayatName, blockName].filter(Boolean).join(", ");
+  const coords =
+    user.latitude != null && user.longitude != null
+      ? `${user.latitude.toFixed(5)}, ${user.longitude.toFixed(5)}`
+      : null;
+
+  const missing =
+    !user.phone || !user.father_name || !user.aadhaar_last4 || coords === null;
+
+  // Auto-open the form while any detail is still missing.
+  useEffect(() => {
+    if (missing) setEditing(true);
+  }, [missing]);
 
   const rows: Array<[string, string]> = [
     [t("userId"), user.user_id],
     [t("role"), t(user.role)],
     [t("phoneLabel"), user.phone ?? t("notProvided")],
     [t("fathersName"), user.father_name ?? t("notProvided")],
+    [t("aadhaarLast4"), user.aadhaar_last4 ?? t("notProvided")],
     [t("locationLabel"), location || t("notProvided")],
+    [t("coordinatesLabel"), coords ?? t("notProvided")],
   ];
+
+  const captureGps = async () => {
+    setBusyGps(true);
+    try {
+      const { lat, lng } = await getGpsCoords();
+      await persistProfile({ latitude: lat, longitude: lng });
+      toast.success(t("gpsSaved"));
+    } catch {
+      toast.error(t("gpsFailed"));
+    } finally {
+      setBusyGps(false);
+    }
+  };
+
+  const saveDetails = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const phone = draft.phone.trim();
+    const aadhaar = draft.aadhaar_last4.trim();
+    if (phone && !PHONE_RE.test(phone)) {
+      toast.error(t("invalidPhone"));
+      return;
+    }
+    if (aadhaar && !/^\d{4}$/.test(aadhaar)) {
+      toast.error(t("invalidAadhaar"));
+      return;
+    }
+    setSaving(true);
+    try {
+      await persistProfile({
+        phone: phone || null,
+        father_name: draft.father_name.trim() || null,
+        aadhaar_last4: aadhaar || null,
+      });
+      toast.success(t("savedOk"));
+      setEditing(false);
+    } catch {
+      toast.error(t("errGeneric"));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <Card className="border-[#c2c8c1]/40">
+      <CardHeader className="flex flex-row items-start justify-between space-y-0">
+        <div>
+          <CardTitle className="font-serif text-[#082717]">
+            {missing ? t("completeProfile") : t("myProfile")}
+          </CardTitle>
+          {missing ? (
+            <p className="mt-1 text-xs text-[#424843]">{t("completeProfileBody")}</p>
+          ) : null}
+        </div>
+        {!editing && (
+          <Button variant="outline" size="sm" onClick={() => setEditing(true)} className="rounded-full">
+            {t("editDetails")}
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {editing ? (
+          <form onSubmit={saveDetails} className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="dash_phone">{t("phoneLabel")}</Label>
+              <Input
+                id="dash_phone"
+                type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                placeholder="98XXXXXXXX"
+                value={draft.phone}
+                onChange={(e) => setDraft({ ...draft, phone: e.target.value.replace(/\D/g, "").slice(0, 10) })}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="dash_father">{t("fathersName")}</Label>
+              <Input
+                id="dash_father"
+                value={draft.father_name}
+                onChange={(e) => setDraft({ ...draft, father_name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="dash_aadhaar">{t("aadhaarLast4")}</Label>
+              <Input
+                id="dash_aadhaar"
+                inputMode="numeric"
+                maxLength={4}
+                placeholder="XXXX"
+                value={draft.aadhaar_last4}
+                onChange={(e) => setDraft({ ...draft, aadhaar_last4: e.target.value.replace(/\D/g, "").slice(0, 4) })}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-2 rounded-xl border border-[#c2c8c1]/40 bg-[#f6f3ed] px-3 py-2.5">
+              <p className="flex items-center gap-1.5 text-xs text-[#424843]">
+                <MapPin className="size-3.5 text-[#1f3d2b]" />
+                {coords ?? t("needLocationFirst")}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={busyGps}
+                onClick={captureGps}
+                className="rounded-full"
+              >
+                <Navigation className="size-3.5 mr-1" />
+                {t("useGps")}
+              </Button>
+            </div>
+            <div className="flex justify-end gap-2">
+              {!missing && (
+                <Button type="button" variant="ghost" size="sm" onClick={() => setEditing(false)}>
+                  {t("cancel")}
+                </Button>
+              )}
+              <Button type="submit" size="sm" disabled={saving} className="bg-[#1f3d2b] text-white hover:bg-[#1f3d2b]/90">
+                {t("saveChanges")}
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <dl className="space-y-3 text-sm">
+            {rows.map(([label, value]) => (
+              <div key={label} className="flex items-start justify-between gap-4">
+                <dt className="text-[#424843]">{label}</dt>
+                <dd className="font-medium text-right text-[#082717] break-all">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function NearestOwnersCard() {
+  const { t } = useI18n();
+  const user = useAuth((s) => s.user);
+  const [busyGps, setBusyGps] = useState(false);
+
+  const hasCoords = user?.latitude != null && user?.longitude != null;
+
+  const { data: owners, isPending, error } = useQuery({
+    queryKey: ["nearby-owners", user?.latitude, user?.longitude],
+    queryFn: () => api.nearbyOwners(user!.latitude!, user!.longitude!),
+    enabled: hasCoords,
+  });
+
+  const captureGps = async () => {
+    setBusyGps(true);
+    try {
+      const { lat, lng } = await getGpsCoords();
+      await persistProfile({ latitude: lat, longitude: lng });
+      toast.success(t("gpsSaved"));
+    } catch {
+      toast.error(t("gpsFailed"));
+    } finally {
+      setBusyGps(false);
+    }
+  };
+
+  const isRpcMissing =
+    error != null && /does not exist|42883|PGRST202|schema cache/i.test(String((error as Error).message));
+
+  return (
+    <Card className="border-[#c2c8c1]/40 lg:col-span-3">
       <CardHeader>
-        <CardTitle className="font-serif text-[#082717]">{t("myProfile")}</CardTitle>
+        <CardTitle className="font-serif text-[#082717]">{t("ownersNearYou")}</CardTitle>
+        <p className="mt-1 text-xs text-[#424843]">{t("ownersNearBody")}</p>
       </CardHeader>
       <CardContent>
-        <dl className="space-y-3 text-sm">
-          {rows.map(([label, value]) => (
-            <div key={label} className="flex items-start justify-between gap-4">
-              <dt className="text-[#424843]">{label}</dt>
-              <dd className="font-medium text-right text-[#082717] break-all">{value}</dd>
-            </div>
-          ))}
-        </dl>
+        {!hasCoords ? (
+          <div className="flex flex-col items-start justify-between gap-3 rounded-xl border border-[#c2c8c1]/40 bg-[#f6f3ed] px-4 py-3 sm:flex-row sm:items-center">
+            <p className="text-sm text-[#424843]">{t("needLocationFirst")}</p>
+            <Button
+              size="sm"
+              disabled={busyGps}
+              onClick={captureGps}
+              className="rounded-full bg-[#1f3d2b] text-white hover:bg-[#1f3d2b]/90"
+            >
+              <Navigation className="size-4 mr-1.5" />
+              {t("useGps")}
+            </Button>
+          </div>
+        ) : isPending ? (
+          <p className="text-sm text-muted-foreground">{t("loading")}</p>
+        ) : isRpcMissing ? (
+          <p className="text-sm text-[#785600]">{t("rpcMissing")}</p>
+        ) : error ? (
+          <p className="text-sm text-[#424843]">{t("errGeneric")}</p>
+        ) : (owners ?? []).length === 0 ? (
+          <p className="text-sm text-[#424843]">{t("noOwnersNearby")}</p>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {(owners ?? []).map((o) => (
+              <div key={o.owner_id} className="rounded-xl border border-[#c2c8c1]/40 bg-white p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium text-[#082717] leading-tight">{o.full_name}</p>
+                  {o.distance_km != null && (
+                    <Badge variant="outline" className="border-[#1f3d2b]/40 text-[#1f3d2b] whitespace-nowrap">
+                      {o.distance_km} {t("kmAway")}
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-[#424843]">
+                  {[o.village_name, o.panchayat_name, o.block_name].filter(Boolean).join(", ") || "—"}
+                </p>
+                {o.phone ? (
+                  <a
+                    href={`tel:${o.phone}`}
+                    className="inline-flex items-center gap-1.5 text-sm font-medium text-[#7b5800] hover:underline"
+                  >
+                    <Phone className="size-3.5" /> {o.phone}
+                  </a>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

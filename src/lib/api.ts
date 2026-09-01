@@ -1,6 +1,6 @@
 import { supabase } from "./supabase";
 import { getMockBackend, persistMockBackend, ApiError, type RegisterInput } from "./mock-backend";
-import type { AppUser, AuthResponse, Block, LandPlot, Machine, Panchayat, Village } from "./types";
+import type { AppUser, AuthResponse, Block, LandPlot, Machine, NearbyOwner, Panchayat, Village } from "./types";
 
 /**
  * True when no Supabase project is configured — falls back to the
@@ -65,6 +65,9 @@ function rowToAppUser(row: any): AppUser {
     village_id: row.village_id,
     latitude: row.latitude,
     longitude: row.longitude,
+    phone: row.phone,
+    father_name: row.father_name,
+    aadhaar_last4: row.aadhaar_last4,
     submitted_at: row.submitted_at,
     reviewed_at: row.reviewed_at,
     rejection_reason: row.rejection_reason,
@@ -338,6 +341,33 @@ export const api = {
       implements: [],
       photos: Array.isArray(row.photos) ? row.photos : [],
     })) as Machine[];
+  },
+
+  /**
+   * Approved equipment owners sorted by distance from the given point.
+   * Backed by the SECURITY DEFINER RPC in supabase/nearby_owners_rpc.sql —
+   * a plain `profiles` select would be blocked by RLS for non-admin users.
+   */
+  nearbyOwners: async (lat: number, lng: number, radiusKm = 100): Promise<NearbyOwner[]> => {
+    if (OFFLINE_MODE) return [];
+
+    const { data, error } = await supabase.rpc("nearby_equipment_owners", {
+      lat,
+      lng,
+      radius_km: radiusKm,
+    });
+    if (error) throw new ApiError(0, error.message);
+    return (data ?? []).map((row: any) => ({
+      owner_id: row.owner_id,
+      full_name: row.full_name ?? "",
+      phone: row.phone ?? null,
+      village_name: row.village_name ?? null,
+      panchayat_name: row.panchayat_name ?? null,
+      block_name: row.block_name ?? null,
+      latitude: row.latitude != null ? Number(row.latitude) : null,
+      longitude: row.longitude != null ? Number(row.longitude) : null,
+      distance_km: row.distance_km != null ? Number(row.distance_km) : null,
+    })) as NearbyOwner[];
   },
 };
 

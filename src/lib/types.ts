@@ -87,6 +87,19 @@ export interface OperatorProfile {
   daily_wage: number;
 }
 
+/** An approved equipment owner matched by distance (from nearby_equipment_owners RPC). */
+export interface NearbyOwner {
+  owner_id: string;
+  full_name: string;
+  phone: string | null;
+  village_name: string | null;
+  panchayat_name: string | null;
+  block_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  distance_km: number | null;
+}
+
 export interface AuthResponse {
   user: AppUser;
   token: string;
