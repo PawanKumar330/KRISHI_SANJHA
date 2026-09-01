@@ -3,8 +3,6 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// Admin client — uses the service_role key, bypasses RLS and the public
-// signup rate limit entirely. This code only ever runs server-side.
 const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
 const corsHeaders = {
@@ -15,6 +13,15 @@ const corsHeaders = {
 function toAuthEmail(userId: string): string {
   return `${userId.toLowerCase()}@jamui.local`;
 }
+
+const VERIFIER_OF: Record<string, string | null> = {
+  FARMER: "VILLAGE_ADMIN",
+  EQUIPMENT_OWNER: "VILLAGE_ADMIN",
+  OPERATOR: "VILLAGE_ADMIN",
+  VILLAGE_ADMIN: "BLOCK_ADMIN",
+  BLOCK_ADMIN: "DISTRICT_ADMIN",
+  DISTRICT_ADMIN: null,
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -33,9 +40,14 @@ Deno.serve(async (req) => {
       village_id,
       latitude,
       longitude,
+      phone,
+      father_name,
+      aadhaar_last4,
+      equipment,
+      operator,
     } = body;
 
-    if (!user_id || !password || !full_name || !role || !block_id) {
+    if (!user_id || !password || !full_name || !role || !block_id || !phone) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -44,8 +56,6 @@ Deno.serve(async (req) => {
 
     const email = toAuthEmail(user_id);
 
-    // Create the auth user directly via Admin API.
-    // email_confirm: true marks it confirmed immediately — no email is sent.
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email,
       password,
@@ -69,16 +79,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // VERIFIER_OF mapping, mirrored from src/lib/types.ts
-    const VERIFIER_OF: Record<string, string | null> = {
-      FARMER: "VILLAGE_ADMIN",
-      EQUIPMENT_OWNER: "VILLAGE_ADMIN",
-      OPERATOR: "VILLAGE_ADMIN",
-      VILLAGE_ADMIN: "BLOCK_ADMIN",
-      BLOCK_ADMIN: "DISTRICT_ADMIN",
-      DISTRICT_ADMIN: null,
-    };
-
     const { data: profileRow, error: profileError } = await admin
       .from("profiles")
       .insert({
@@ -93,12 +93,14 @@ Deno.serve(async (req) => {
         latitude: latitude ?? null,
         longitude: longitude ?? null,
         verifier_role: VERIFIER_OF[role] ?? null,
+        phone,
+        father_name: father_name || null,
+        aadhaar_last4: aadhaar_last4 || null,
       })
       .select()
       .single();
 
     if (profileError) {
-      // Roll back the auth user so retries don't collide with a half-created account.
       await admin.auth.admin.deleteUser(authUser.id);
       return new Response(JSON.stringify({ error: profileError.message }), {
         status: 500,
@@ -106,18 +108,62 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Generate a real session for this user so the frontend can log them in
-    // immediately, exactly like a normal signInWithPassword() would.
-    const { data: signInData, error: signInError } = await admin.auth.signInWithPassword({
-      email,
-      password,
-    });
+    let roleDataWarning: string | null = null;
+
+    if (role === "EQUIPMENT_OWNER" && equipment) {
+      const { data: chc, error: chcError } = await admin
+        .from("chc_enterprises")
+        .insert({
+          owner_id: authUser.id,
+          business_name: `${full_name}'s Equipment`,
+          verification_status: "PENDING_APPROVAL",
+        })
+        .select()
+        .single();
+
+      if (chcError) {
+        roleDataWarning = `Profile created, but equipment setup failed: ${chcError.message}`;
+      } else {
+        const { error: eqError } = await admin.from("equipment").insert({
+          owner_id: authUser.id,
+          chc_id: chc.id,
+          category: equipment.category,
+          sub_category: equipment.sub_category || null,
+          make_model: equipment.make_model,
+          hp_rating: equipment.hp_rating ?? null,
+          hourly_rate: equipment.hourly_rate ?? null,
+          acre_rate: equipment.acre_rate ?? null,
+          implements: equipment.implements ?? [],
+          is_active: false,
+        });
+        if (eqError) {
+          roleDataWarning = `Profile created, but equipment setup failed: ${eqError.message}`;
+        }
+      }
+    }
+
+    if (role === "OPERATOR" && operator) {
+      const { error: opError } = await admin.from("operator_profiles").insert({
+        user_id: authUser.id,
+        driving_license_no: operator.driving_license_no,
+        experience_years: operator.experience_years,
+        preferred_equipment_types: operator.preferred_equipment_types,
+        daily_wage: operator.daily_wage,
+        verification_status: "PENDING_APPROVAL",
+      });
+      if (opError) {
+        roleDataWarning = `Profile created, but operator setup failed: ${opError.message}`;
+      }
+    }
+
+    const { data: signInData } = await admin.auth.signInWithPassword({ email, password });
 
     return new Response(
       JSON.stringify({
         user: profileRow,
         token: signInData?.session?.access_token ?? "",
         session: signInData?.session ?? null,
+        warning: roleDataWarning,
       }),
       {
         status: 200,

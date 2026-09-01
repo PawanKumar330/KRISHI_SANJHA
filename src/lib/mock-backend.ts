@@ -19,6 +19,24 @@ export interface RegisterInput {
   village_id?: number | null;
   latitude?: number | null;
   longitude?: number | null;
+  phone: string;
+  father_name?: string | null;
+  aadhaar_last4?: string | null;
+  equipment?: {
+    category: string;
+    sub_category?: string;
+    make_model: string;
+    hp_rating?: number;
+    hourly_rate?: number;
+    acre_rate?: number;
+    implements?: string[];
+  } | null;
+  operator?: {
+    driving_license_no: string;
+    experience_years: number;
+    preferred_equipment_types: string[];
+    daily_wage: number;
+  } | null;
 }
 
 export class ApiError extends Error {

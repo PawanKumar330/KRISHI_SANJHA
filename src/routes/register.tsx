@@ -206,6 +206,31 @@ function RegisterPage() {
       village_id: loc.village_id,
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
+      phone: personal.phone,
+      father_name: personal.father_name.trim() || undefined,
+      aadhaar_last4: personal.aadhaar_last4 || undefined,
+      equipment:
+        role === "EQUIPMENT_OWNER"
+          ? {
+              category: equipment.category,
+              sub_category: equipment.tractor_make || undefined,
+              make_model: equipment.make_model,
+              hp_rating: equipment.hp_rating ? Number(equipment.hp_rating) : undefined,
+              hourly_rate: equipment.hourly_rate ? Number(equipment.hourly_rate) : undefined,
+              acre_rate: equipment.acre_rate ? Number(equipment.acre_rate) : undefined,
+            }
+          : undefined,
+      operator:
+        role === "OPERATOR"
+          ? {
+              driving_license_no: operator.driving_license_no,
+              experience_years: operator.experience_years ? Number(operator.experience_years) : 0,
+              preferred_equipment_types: operator.preferred_equipment.length
+                ? operator.preferred_equipment
+                : [equipment.category || "General"],
+              daily_wage: operator.daily_wage ? Number(operator.daily_wage) : 0,
+            }
+          : undefined,
     });
 
     if (!parsed.success) {
@@ -222,6 +247,9 @@ function RegisterPage() {
       const res = await api.register({ ...rest, latitude: rest.latitude ?? null, longitude: rest.longitude ?? null });
       writeToken(res.token, true);
       setUser(res.user);
+      if ((res as { warning?: string | null }).warning) {
+        toast.warning((res as { warning?: string }).warning);
+      }
       toast.success("Application submitted! Awaiting verification from your local Grameen Mitra.");
       navigate({ to: "/pending", replace: true });
     } catch (err) {

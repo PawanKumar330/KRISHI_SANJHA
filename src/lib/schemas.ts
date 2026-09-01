@@ -3,6 +3,7 @@ import { ROLES } from "./types";
 
 /** Govt-portal style handle: 4-24 chars, letters/digits/dot/underscore. */
 export const USER_ID_RE = /^[a-z][a-z0-9._]{3,23}$/;
+export const PHONE_RE = /^[6-9]\d{9}$/; // Indian mobile: 10 digits, starts 6-9
 
 export const userIdSchema = z
   .string()
@@ -36,6 +37,38 @@ export const registerSchema = z
     village_id: z.coerce.number().int().positive("Select a village").nullable(),
     latitude: z.number().min(-90).max(90).nullable().optional(),
     longitude: z.number().min(-180).max(180).nullable().optional(),
+    phone: z
+      .string()
+      .trim()
+      .regex(PHONE_RE, "Enter a valid 10-digit mobile number"),
+    father_name: z.string().trim().max(120).optional().or(z.literal("")),
+    aadhaar_last4: z
+      .string()
+      .trim()
+      .regex(/^\d{4}$/, "Enter exactly 4 digits")
+      .optional()
+      .or(z.literal("")),
+    equipment: z
+      .object({
+        category: z.string().min(1, "Select a category"),
+        sub_category: z.string().optional().or(z.literal("")),
+        make_model: z.string().trim().min(2, "Make / model is required").max(120),
+        hp_rating: z.coerce.number().min(0).max(1000).optional(),
+        hourly_rate: z.coerce.number().min(0).max(100000).optional(),
+        acre_rate: z.coerce.number().min(0).max(100000).optional(),
+        implements: z.array(z.string()).optional(),
+      })
+      .optional()
+      .nullable(),
+    operator: z
+      .object({
+        driving_license_no: z.string().trim().min(6, "Driving licence number is required").max(40),
+        experience_years: z.coerce.number().int().min(0).max(70),
+        preferred_equipment_types: z.array(z.string()).min(1, "Choose at least one machinery type"),
+        daily_wage: z.coerce.number().min(0).max(100000),
+      })
+      .optional()
+      .nullable(),
   })
   .refine((v) => v.password === v.confirm_password, {
     message: "Passwords do not match",
@@ -48,7 +81,15 @@ export const registerSchema = z
   .refine(
     (v) => v.role === "DISTRICT_ADMIN" || v.role === "BLOCK_ADMIN" || v.village_id != null,
     { message: "Select a village", path: ["village_id"] },
-  );
+  )
+  .refine((v) => v.role !== "EQUIPMENT_OWNER" || v.equipment != null, {
+    message: "Equipment details are required",
+    path: ["equipment"],
+  })
+  .refine((v) => v.role !== "OPERATOR" || v.operator != null, {
+    message: "Operator details are required",
+    path: ["operator"],
+  });
 export type RegisterValues = z.infer<typeof registerSchema>;
 
 export const SOIL_TYPES = ["Alluvial", "Loam", "Clay", "Sandy Loam", "Red", "Black"] as const;

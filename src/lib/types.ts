@@ -40,6 +40,9 @@ export interface AppUser {
   village_id: number | null;
   latitude?: number | null;
   longitude?: number | null;
+  phone?: string | null;
+  father_name?: string | null;
+  aadhaar_last4?: string | null;
   submitted_at: string;
   reviewed_at?: string | null;
   rejection_reason?: string | null;
