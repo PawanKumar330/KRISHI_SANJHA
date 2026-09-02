@@ -1,8 +1,19 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { MapPin, Navigation, Phone } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  Building2,
+  MapPin,
+  Navigation,
+  Phone,
+  Shield,
+  Tractor,
+  Truck,
+  Wrench,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -80,6 +91,22 @@ function DashboardPage() {
   }
 
   const isFarmer = user.role === "FARMER";
+  const isOwner = user.role === "EQUIPMENT_OWNER";
+
+  const ownerEquipmentQuery = useQuery({
+    queryKey: ["my-equipment"],
+    queryFn: api.myEquipment,
+    enabled: isOwner,
+  });
+
+  const ownerEnterpriseQuery = useQuery({
+    queryKey: ["my-enterprise"],
+    queryFn: api.myEnterprise,
+    enabled: isOwner,
+  });
+
+  const isOwnerProfileMissing =
+    isOwner && !ownerEquipmentQuery.isPending && !ownerEquipmentQuery.data;
 
   return (
     <AppShell>
@@ -108,6 +135,35 @@ function DashboardPage() {
           </div>
         </div>
 
+        {/* Incomplete Equipment Profile Banner for Equipment Owners */}
+        {isOwnerProfileMissing && (
+          <div className="rounded-2xl border-2 border-[#ffcd6d] bg-[#fff8e6] p-5 shadow-xs">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className="rounded-xl bg-[#ffcd6d]/50 p-2.5 text-[#785600] shrink-0">
+                  <Tractor className="size-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[#785600] text-base">
+                    Incomplete Equipment Profile
+                  </h3>
+                  <p className="mt-0.5 text-xs text-[#785600]/90 max-w-2xl leading-relaxed">
+                    Your enterprise and farm machinery details are missing. Complete your equipment profile so farmers across Jamui district can discover, view rates, and rent your machinery.
+                  </p>
+                </div>
+              </div>
+              <Button
+                asChild
+                className="bg-[#1f3d2b] text-white hover:bg-[#082717] rounded-xl font-medium shrink-0 h-10 px-5 shadow-xs"
+              >
+                <Link to="/equipment/complete">
+                  Complete Equipment Profile <ArrowRight className="w-4 h-4 ml-1.5" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <ProfileCard user={user} />
 
@@ -116,6 +172,14 @@ function DashboardPage() {
               <LandPlotsCard userId={user.id} villageId={user.village_id} />
               <NearestOwnersCard />
             </>
+          ) : null}
+
+          {isOwner ? (
+            <OwnerEquipmentCard
+              enterprise={ownerEnterpriseQuery.data}
+              equipment={ownerEquipmentQuery.data}
+              isLoading={ownerEquipmentQuery.isPending || ownerEnterpriseQuery.isPending}
+            />
           ) : null}
         </div>
 
@@ -634,3 +698,158 @@ function MachineryCard() {
     </Card>
   );
 }
+
+function OwnerEquipmentCard({
+  enterprise,
+  equipment,
+  isLoading,
+}: {
+  enterprise: Record<string, any> | null | undefined;
+  equipment: Record<string, any> | null | undefined;
+  isLoading: boolean;
+}) {
+  const { t } = useI18n();
+
+  return (
+    <Card className="border-[#c2c8c1]/40 lg:col-span-2">
+      <CardHeader className="flex flex-row items-start justify-between pb-3">
+        <div>
+          <CardTitle className="font-serif text-[#082717] flex items-center gap-2">
+            <Tractor className="size-5 text-[#1f3d2b]" />
+            {t("myEquipmentTitle", "My Machinery & Enterprise Profile")}
+          </CardTitle>
+          <p className="mt-1 text-xs text-[#424843]">
+            {t("myEquipmentDesc", "Your registered Custom Hiring Center (CHC) machinery fleet & rental rates.")}
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          asChild
+          className="rounded-xl border-[#c2c8c1] text-xs h-8"
+        >
+          <Link to="/equipment/complete">
+            {equipment ? t("edit", "Edit Details") : t("completeProfile", "Complete Profile")}
+          </Link>
+        </Button>
+      </CardHeader>
+      <CardContent>
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">{t("loading")}</p>
+        ) : !equipment && !enterprise ? (
+          <div className="rounded-xl border border-dashed border-[#ffcd6d] bg-[#fff8e6] p-6 text-center space-y-3">
+            <Tractor className="size-8 text-[#785600] mx-auto opacity-70" />
+            <div>
+              <p className="text-sm font-semibold text-[#785600]">
+                {t("noEquipmentRegistered", "No equipment details registered yet")}
+              </p>
+              <p className="text-xs text-[#785600]/80 mt-0.5 max-w-md mx-auto">
+                {t("noEquipmentPrompt", "Add your machinery type, specifications, and rental pricing so farmers can discover and book your services.")}
+              </p>
+            </div>
+            <Button
+              asChild
+              size="sm"
+              className="bg-[#1f3d2b] text-white hover:bg-[#082717] rounded-xl font-medium text-xs h-8"
+            >
+              <Link to="/equipment/complete">
+                {t("addEquipmentNow", "Add Equipment Now")} &rarr;
+              </Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Enterprise Header */}
+            {enterprise && (
+              <div className="rounded-xl bg-[#f6f3ed] p-4 border border-[#c2c8c1]/40">
+                <div className="flex items-center gap-2">
+                  <Building2 className="size-4 text-[#1f3d2b]" />
+                  <h4 className="font-semibold text-sm text-[#082717]">
+                    {enterprise.business_name || "Enterprise"}
+                  </h4>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#424843]">
+                  {enterprise.registration_number && (
+                    <span>Reg: <strong className="font-mono text-[#082717]">{enterprise.registration_number}</strong></span>
+                  )}
+                  {enterprise.gst_number && (
+                    <span>GSTIN: <strong className="font-mono text-[#082717]">{enterprise.gst_number}</strong></span>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Equipment Details */}
+            {equipment && (
+              <div className="rounded-xl border border-[#c2c8c1]/40 bg-white p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[#7b5800] text-xl">agriculture</span>
+                    <h4 className="font-medium text-[#082717]">
+                      {equipment.make_model || equipment.category}
+                    </h4>
+                  </div>
+                  {equipment.hp_rating && (
+                    <Badge variant="outline" className="border-[#c2c8c1] text-[#424843] text-xs">
+                      {equipment.hp_rating} HP
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <Badge className="bg-[#1f3d2b]/10 text-[#1f3d2b] hover:bg-[#1f3d2b]/10 border-0">
+                    {equipment.category}
+                  </Badge>
+                  {equipment.sub_category && (
+                    <Badge variant="outline" className="border-[#c2c8c1] text-[#424843]">
+                      {equipment.sub_category}
+                    </Badge>
+                  )}
+                  {equipment.fuel_type && (
+                    <Badge variant="outline" className="border-[#c2c8c1] text-[#424843]">
+                      {equipment.fuel_type}
+                    </Badge>
+                  )}
+                  {equipment.reg_number && (
+                    <Badge variant="outline" className="border-[#c2c8c1] font-mono text-[#424843]">
+                      RC: {equipment.reg_number}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Rates */}
+                <div className="flex flex-wrap gap-4 pt-1 text-sm font-semibold text-[#082717] border-t border-[#c2c8c1]/20">
+                  {equipment.hourly_rate != null && (
+                    <span className="text-[#1f3d2b]">
+                      ₹{equipment.hourly_rate} <span className="text-xs font-normal text-[#424843]">/ hour</span>
+                    </span>
+                  )}
+                  {equipment.acre_rate != null && (
+                    <span className="text-[#1f3d2b]">
+                      ₹{equipment.acre_rate} <span className="text-xs font-normal text-[#424843]">/ acre</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Capabilities Badges */}
+                <div className="flex flex-wrap gap-3 pt-1 text-xs text-[#424843]">
+                  {equipment.transport_available && (
+                    <span className="inline-flex items-center gap-1 text-[#1f3d2b]">
+                      <Truck className="size-3.5" /> Self-Transport Available
+                    </span>
+                  )}
+                  {equipment.has_insurance && (
+                    <span className="inline-flex items-center gap-1 text-[#1f3d2b]">
+                      <Shield className="size-3.5" /> Insured
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+

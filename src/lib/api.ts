@@ -369,6 +369,100 @@ export const api = {
       distance_km: row.distance_km != null ? Number(row.distance_km) : null,
     })) as NearbyOwner[];
   },
+
+  /**
+   * The signed-in equipment owner's enterprise (CHC) details, or null if
+   * they haven't created one yet (e.g. approved before this data was
+   * being collected — see handoff doc §11.5 / §12).
+   */
+  myEnterprise: async (): Promise<Record<string, any> | null> => {
+    if (OFFLINE_MODE) return null;
+
+    const authUserId = await currentSessionUserId();
+    const { data, error } = await supabase
+      .from("chc_enterprises")
+      .select("*")
+      .eq("owner_id", authUserId)
+      .maybeSingle();
+    if (error) throw new ApiError(0, error.message);
+    return data;
+  },
+
+  /**
+   * The signed-in equipment owner's equipment listing, or null if they
+   * haven't created one yet.
+   */
+  myEquipment: async (): Promise<Record<string, any> | null> => {
+    if (OFFLINE_MODE) return null;
+
+    const authUserId = await currentSessionUserId();
+    const { data, error } = await supabase
+      .from("equipment")
+      .select("*")
+      .eq("owner_id", authUserId)
+      .maybeSingle();
+    if (error) throw new ApiError(0, error.message);
+    return data;
+  },
+
+  /**
+   * Create or update the signed-in owner's enterprise + equipment rows in
+   * a single call. Relies on the existing UNIQUE(owner_id) constraints on
+   * both tables (upsert onConflict: "owner_id") — no new RLS policy is
+   * needed, since the existing "Owners manage equipment" policy
+   * (auth.uid() = owner_id, FOR ALL) already permits this.
+   *
+   * The enterprise row is saved first so its generated `id` can be used
+   * to correctly set `equipment.chc_id`, keeping the two rows linked
+   * rather than just coincidentally sharing the same owner_id.
+   *
+   * Note: `is_active` on the equipment row is intentionally NOT settable
+   * here, so a self-service edit can't make an unapproved/incomplete
+   * listing public on its own.
+   */
+  saveMyEquipmentProfile: async (payload: {
+    enterprise: {
+      business_name: string;
+      registration_number?: string;
+      gst_number?: string;
+      village_id?: number | null;
+      latitude?: number | null;
+      longitude?: number | null;
+    };
+    equipment: {
+      category: string;
+      sub_category?: string;
+      make_model?: string;
+      hp_rating?: number;
+      hourly_rate?: number;
+      acre_rate?: number;
+      fuel_type?: string;
+      reg_number?: string;
+      transport_available?: boolean;
+      has_insurance?: boolean;
+    };
+  }): Promise<{ ok: true }> => {
+    if (OFFLINE_MODE) return { ok: true };
+
+    const authUserId = await currentSessionUserId();
+
+    const { data: enterprise, error: enterpriseErr } = await supabase
+      .from("chc_enterprises")
+      .upsert({ ...payload.enterprise, owner_id: authUserId }, { onConflict: "owner_id" })
+      .select("id")
+      .single();
+    if (enterpriseErr) throw new ApiError(0, enterpriseErr.message);
+
+    const { error: equipmentErr } = await supabase
+      .from("equipment")
+      .upsert(
+        { ...payload.equipment, owner_id: authUserId, chc_id: enterprise.id },
+        { onConflict: "owner_id" }
+      );
+    if (equipmentErr) throw new ApiError(0, equipmentErr.message);
+
+    return { ok: true };
+  },
 };
 
 export { ApiError };

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as EquipmentCompleteRouteImport } from './routes/equipment.complete'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PendingRouteImport } from './routes/pending'
 import { Route as RegisterRouteImport } from './routes/register'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EquipmentCompleteRoute = EquipmentCompleteRouteImport.update({
+  id: '/equipment/complete',
+  path: '/equipment/complete',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -50,6 +56,7 @@ const VerificationRoute = VerificationRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/equipment/complete': typeof EquipmentCompleteRoute
   '/login': typeof LoginRoute
   '/pending': typeof PendingRoute
   '/register': typeof RegisterRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/equipment/complete': typeof EquipmentCompleteRoute
   '/login': typeof LoginRoute
   '/pending': typeof PendingRoute
   '/register': typeof RegisterRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/equipment/complete': typeof EquipmentCompleteRoute
   '/login': typeof LoginRoute
   '/pending': typeof PendingRoute
   '/register': typeof RegisterRoute
@@ -75,13 +84,27 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/dashboard' | '/login' | '/pending' | '/register' | '/verification'
+    | '/'
+    | '/dashboard'
+    | '/equipment/complete'
+    | '/login'
+    | '/pending'
+    | '/register'
+    | '/verification'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/pending' | '/register' | '/verification'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/equipment/complete'
+    | '/login'
+    | '/pending'
+    | '/register'
+    | '/verification'
   id:
     | '__root__'
     | '/'
     | '/dashboard'
+    | '/equipment/complete'
     | '/login'
     | '/pending'
     | '/register'
@@ -91,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  EquipmentCompleteRoute: typeof EquipmentCompleteRoute
   LoginRoute: typeof LoginRoute
   PendingRoute: typeof PendingRoute
   RegisterRoute: typeof RegisterRoute
@@ -111,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/equipment/complete': {
+      id: '/equipment/complete'
+      path: '/equipment/complete'
+      fullPath: '/equipment/complete'
+      preLoaderRoute: typeof EquipmentCompleteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -147,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  EquipmentCompleteRoute: EquipmentCompleteRoute,
   LoginRoute: LoginRoute,
   PendingRoute: PendingRoute,
   RegisterRoute: RegisterRoute,
