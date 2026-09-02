@@ -716,10 +716,10 @@ function OwnerEquipmentCard({
         <div>
           <CardTitle className="font-serif text-[#082717] flex items-center gap-2">
             <Tractor className="size-5 text-[#1f3d2b]" />
-            {t("myEquipmentTitle", "My Machinery & Enterprise Profile")}
+            My Machinery & Enterprise Profile
           </CardTitle>
           <p className="mt-1 text-xs text-[#424843]">
-            {t("myEquipmentDesc", "Your registered Custom Hiring Center (CHC) machinery fleet & rental rates.")}
+            Your registered Custom Hiring Center (CHC) machinery fleet & rental rates.
           </p>
         </div>
         <Button
@@ -729,7 +729,7 @@ function OwnerEquipmentCard({
           className="rounded-xl border-[#c2c8c1] text-xs h-8"
         >
           <Link to="/equipment/complete">
-            {equipment ? t("edit", "Edit Details") : t("completeProfile", "Complete Profile")}
+            {equipment ? "Edit Details" : t("completeProfile")}
           </Link>
         </Button>
       </CardHeader>
@@ -741,10 +741,10 @@ function OwnerEquipmentCard({
             <Tractor className="size-8 text-[#785600] mx-auto opacity-70" />
             <div>
               <p className="text-sm font-semibold text-[#785600]">
-                {t("noEquipmentRegistered", "No equipment details registered yet")}
+                No equipment details registered yet
               </p>
               <p className="text-xs text-[#785600]/80 mt-0.5 max-w-md mx-auto">
-                {t("noEquipmentPrompt", "Add your machinery type, specifications, and rental pricing so farmers can discover and book your services.")}
+                Add your machinery type, specifications, and rental pricing so farmers can discover and book your services.
               </p>
             </div>
             <Button
@@ -753,7 +753,7 @@ function OwnerEquipmentCard({
               className="bg-[#1f3d2b] text-white hover:bg-[#082717] rounded-xl font-medium text-xs h-8"
             >
               <Link to="/equipment/complete">
-                {t("addEquipmentNow", "Add Equipment Now")} &rarr;
+                Add Equipment Now &rarr;
               </Link>
             </Button>
           </div>
