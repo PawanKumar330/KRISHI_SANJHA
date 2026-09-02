@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
-import { ShieldCheck, Tractor, Users, Award, MapPin, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, Tractor, Users, Award, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -107,29 +107,27 @@ function AboutPage() {
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xs border border-[#c2c8c1]/40">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-[#7b5800]/10 flex items-center justify-center text-[#7b5800]">
-                  <MapPin className="size-5" />
+                  <Users className="size-5" />
                 </div>
                 <div>
-                  <h3 className="font-serif text-lg font-bold text-[#082717]">Operating & Regional Office</h3>
-                  <p className="text-xs text-[#7b5800] font-medium">Headquarters & Service Hub</p>
+                  <h3 className="font-serif text-lg font-bold text-[#082717]">Contact & Customer Support</h3>
+                  <p className="text-xs text-[#7b5800] font-medium">Official Assistance & Inquiries</p>
                 </div>
               </div>
-              <address className="not-italic text-sm text-[#424843] space-y-2 leading-relaxed">
-                <p className="font-medium text-[#1c1c18]">
-                  Krishi Sanjha Agri-Hub, Main Commercial Road,<br />
-                  Opposite Block Agriculture Office,<br />
-                  Jamui District, Bihar – 811307, India
-                </p>
-                <p className="pt-2">
+              <div className="text-sm text-[#424843] space-y-2 leading-relaxed">
+                <p>
                   <span className="font-semibold text-[#1c1c18]">Helpline:</span> +91 98765 43210 / +91 80023 45678
                 </p>
                 <p>
-                  <span className="font-semibold text-[#1c1c18]">Official Email:</span> contact@krishisanjha.in / support@krishisanjha.in
+                  <span className="font-semibold text-[#1c1c18]">Official Email:</span>{" "}
+                  <a href="mailto:krishisanjha@gmail.com" className="text-[#7b5800] underline">
+                    krishisanjha@gmail.com
+                  </a>
                 </p>
                 <p>
                   <span className="font-semibold text-[#1c1c18]">Working Hours:</span> Mon–Sat 8:00 AM – 8:00 PM IST
                 </p>
-              </address>
+              </div>
             </div>
           </div>
 

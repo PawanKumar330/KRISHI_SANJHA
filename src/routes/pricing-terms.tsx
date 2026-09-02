@@ -150,8 +150,8 @@ function PricingTermsPage() {
                 <h4 className="font-bold text-[#082717] mb-1">Billing Support & Dispute Redressal</h4>
                 <p className="text-xs sm:text-sm text-[#424843]">
                   Have a question about a charge, payment failure, or invoice? Email our billing team at{" "}
-                  <a href="mailto:billing@krishisanjha.in" className="text-[#7b5800] underline font-semibold">
-                    billing@krishisanjha.in
+                  <a href="mailto:krishisanjha@gmail.com" className="text-[#7b5800] underline font-semibold">
+                    krishisanjha@gmail.com
                   </a>{" "}
                   or call <strong>+91 98765 43210</strong>. Review our{" "}
                   <Link to="/refund-policy" className="text-[#7b5800] underline font-semibold">

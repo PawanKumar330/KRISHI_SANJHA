@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOut, Languages, Menu, X, ShieldCheck, Phone, Mail, MapPin, IndianRupee } from "lucide-react";
+import { LogOut, Languages, Menu, X, ShieldCheck, Phone, Mail, IndianRupee } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-store";
@@ -259,12 +259,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               <p className="text-xs text-[#424843] leading-relaxed mb-3">
                 Empowering Indian farmers through shared access to verified machinery and certified operators.
               </p>
-              <div className="text-xs text-[#424843] space-y-1">
-                <div className="flex items-start gap-1.5">
-                  <MapPin className="size-3.5 text-[#7b5800] shrink-0 mt-0.5" />
-                  <span>Main Road, Opposite Block Agri Office, Jamui, Bihar – 811307</span>
-                </div>
-              </div>
               {OFFLINE_MODE ? (
                 <p className="mt-2 text-[11px] text-[#7b5800]">{t("offlineNote")}</p>
               ) : null}
@@ -319,8 +313,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
               <div className="flex items-center gap-1.5 text-xs sm:text-sm text-[#424843]">
                 <Mail className="size-3.5 text-[#7b5800] shrink-0" />
-                <a href="mailto:support@krishisanjha.in" className="hover:text-[#7b5800] underline">
-                  support@krishisanjha.in
+                <a href="mailto:krishisanjha@gmail.com" className="hover:text-[#7b5800] underline">
+                  krishisanjha@gmail.com
                 </a>
               </div>
               <p className="text-xs text-[#737873] mt-1">
@@ -328,7 +322,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               </p>
               <div className="mt-2 pt-2 border-t border-[#c2c8c1]/40 text-xs text-[#424843]">
                 <span className="font-semibold block text-[#082717]">{t("grievanceOfficer")}:</span>
-                <span>Mr. Pawan Kumar (grievance@krishisanjha.in)</span>
+                <span>Mr. Pawan Kumar (krishisanjha@gmail.com)</span>
               </div>
             </div>
           </div>

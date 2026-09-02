@@ -130,8 +130,7 @@ function PrivacyPage() {
               </p>
               <p className="text-sm font-semibold text-[#1c1c18] mt-2">
                 Data Protection Officer, Krishi Sanjha Technologies Pvt. Ltd.<br />
-                Email: <a href="mailto:privacy@krishisanjha.in" className="text-[#7b5800] hover:underline">privacy@krishisanjha.in</a><br />
-                Office: Krishi Sanjha Agri-Hub, Main Commercial Road, Jamui, Bihar - 811307, India
+                Email: <a href="mailto:krishisanjha@gmail.com" className="text-[#7b5800] hover:underline">krishisanjha@gmail.com</a>
               </p>
             </section>
           </div>

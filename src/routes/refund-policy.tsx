@@ -173,7 +173,7 @@ function RefundPolicyPage() {
               </p>
               <div className="text-sm space-y-1">
                 <p><strong>Support Helpline:</strong> +91 98765 43210 (Mon–Sat 8 AM – 8 PM IST)</p>
-                <p><strong>Refund Email:</strong> <a href="mailto:billing@krishisanjha.in" className="text-[#7b5800] hover:underline">billing@krishisanjha.in</a> / <a href="mailto:support@krishisanjha.in" className="text-[#7b5800] hover:underline">support@krishisanjha.in</a></p>
+                <p><strong>Refund Email:</strong> <a href="mailto:krishisanjha@gmail.com" className="text-[#7b5800] hover:underline">krishisanjha@gmail.com</a></p>
                 <p><strong>Online Support Form:</strong> <Link to="/contact" className="text-[#7b5800] hover:underline font-semibold">Visit Contact & Support Desk</Link></p>
               </div>
             </section>

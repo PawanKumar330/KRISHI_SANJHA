@@ -126,8 +126,7 @@ function LegalPage() {
                 </p>
                 <p className="text-xs sm:text-sm font-semibold text-[#1c1c18]">
                   Compliance Officer, Krishi Sanjha Technologies Pvt. Ltd.<br />
-                  Email: <a href="mailto:compliance@krishisanjha.in" className="text-[#7b5800] hover:underline">compliance@krishisanjha.in</a> / <a href="mailto:support@krishisanjha.in" className="text-[#7b5800] hover:underline">support@krishisanjha.in</a><br />
-                  Office: Krishi Sanjha Agri-Hub, Main Commercial Road, Jamui, Bihar - 811307, India
+                  Email: <a href="mailto:krishisanjha@gmail.com" className="text-[#7b5800] hover:underline">krishisanjha@gmail.com</a>
                 </p>
                 <div className="mt-3 flex flex-wrap gap-3 text-xs">
                   <Link to="/terms" className="text-[#7b5800] underline font-semibold">Terms of Service</Link>

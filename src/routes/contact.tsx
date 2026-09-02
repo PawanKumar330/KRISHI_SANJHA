@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useState } from "react";
-import { MapPin, Phone, Mail, Clock, Send, ShieldAlert, CheckCircle2 } from "lucide-react";
+import { Phone, Mail, Clock, Send, ShieldAlert, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/contact")({
       {
         name: "description",
         content:
-          "Official contact details, customer support helpline, registered address, and grievance redressal officer for Krishi Sanjha Technologies Pvt. Ltd.",
+          "Official contact details, customer support helpline, email, and grievance redressal officer for Krishi Sanjha Technologies Pvt. Ltd.",
       },
     ],
   }),
@@ -67,24 +67,6 @@ function ContactPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
             {/* Contact Information Column */}
             <div className="lg:col-span-5 space-y-6">
-              {/* Registered Address */}
-              <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xs border border-[#c2c8c1]/40">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center text-[#1f3d2b] shrink-0 mt-1">
-                    <MapPin className="size-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#082717] text-base mb-1">Registered & Operating Office</h3>
-                    <p className="text-xs text-[#7b5800] font-semibold mb-2">Krishi Sanjha Technologies Pvt. Ltd.</p>
-                    <p className="text-sm text-[#424843] leading-relaxed">
-                      Krishi Sanjha Agri-Hub, Main Commercial Road,<br />
-                      Opposite Block Agriculture Office,<br />
-                      Jamui District, Bihar – 811307, India
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               {/* Phone & Helpline */}
               <div className="bg-white rounded-2xl p-6 md:p-8 shadow-xs border border-[#c2c8c1]/40">
                 <div className="flex items-start gap-4">
@@ -113,23 +95,11 @@ function ContactPage() {
                     <Mail className="size-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-[#082717] text-base mb-1">Email Communications</h3>
-                    <p className="text-sm text-[#424843] mb-1">
-                      <strong className="text-[#082717]">General Support:</strong>{" "}
-                      <a href="mailto:support@krishisanjha.in" className="text-[#7b5800] hover:underline">
-                        support@krishisanjha.in
-                      </a>
-                    </p>
-                    <p className="text-sm text-[#424843] mb-1">
-                      <strong className="text-[#082717]">Billing & Payments:</strong>{" "}
-                      <a href="mailto:billing@krishisanjha.in" className="text-[#7b5800] hover:underline">
-                        billing@krishisanjha.in
-                      </a>
-                    </p>
+                    <h3 className="font-bold text-[#082717] text-base mb-1">Official Email</h3>
                     <p className="text-sm text-[#424843]">
-                      <strong className="text-[#082717]">Partnerships:</strong>{" "}
-                      <a href="mailto:info@krishisanjha.in" className="text-[#7b5800] hover:underline">
-                        info@krishisanjha.in
+                      <strong className="text-[#082717]">Email:</strong>{" "}
+                      <a href="mailto:krishisanjha@gmail.com" className="text-[#7b5800] hover:underline font-medium">
+                        krishisanjha@gmail.com
                       </a>
                     </p>
                   </div>
@@ -300,8 +270,8 @@ function ContactPage() {
                   </div>
                   <div>
                     <span className="text-[#737873] block">Direct Email:</span>
-                    <a href="mailto:grievance@krishisanjha.in" className="font-semibold text-[#7b5800] hover:underline">
-                      grievance@krishisanjha.in
+                    <a href="mailto:krishisanjha@gmail.com" className="font-semibold text-[#7b5800] hover:underline">
+                      krishisanjha@gmail.com
                     </a>
                   </div>
                   <div>

@@ -151,8 +151,7 @@ function TermsPage() {
               </p>
               <p className="text-sm font-semibold text-[#1c1c18] mt-2">
                 Legal Department, Krishi Sanjha Technologies Pvt. Ltd.<br />
-                Email: <a href="mailto:legal@krishisanjha.in" className="text-[#7b5800] hover:underline">legal@krishisanjha.in</a> / <a href="mailto:support@krishisanjha.in" className="text-[#7b5800] hover:underline">support@krishisanjha.in</a><br />
-                Address: Krishi Sanjha Agri-Hub, Main Commercial Road, Jamui, Bihar - 811307, India
+                Email: <a href="mailto:krishisanjha@gmail.com" className="text-[#7b5800] hover:underline">krishisanjha@gmail.com</a>
               </p>
             </section>
           </div>
