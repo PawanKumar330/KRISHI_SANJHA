@@ -10,16 +10,33 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as EquipmentCompleteRouteImport } from './routes/equipment.complete'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PendingRouteImport } from './routes/pending'
+import { Route as PricingTermsRouteImport } from './routes/pricing-terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
+import { Route as EquipmentCompleteRouteImport } from './routes/equipment.complete'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -27,9 +44,9 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EquipmentCompleteRoute = EquipmentCompleteRouteImport.update({
-  id: '/equipment/complete',
-  path: '/equipment/complete',
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -42,9 +59,29 @@ const PendingRoute = PendingRouteImport.update({
   path: '/pending',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricingTermsRoute = PricingTermsRouteImport.update({
+  id: '/pricing-terms',
+  path: '/pricing-terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerificationRoute = VerificationRouteImport.update({
@@ -52,73 +89,127 @@ const VerificationRoute = VerificationRouteImport.update({
   path: '/verification',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EquipmentCompleteRoute = EquipmentCompleteRouteImport.update({
+  id: '/equipment/complete',
+  path: '/equipment/complete',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
-  '/equipment/complete': typeof EquipmentCompleteRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pending': typeof PendingRoute
+  '/pricing-terms': typeof PricingTermsRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
+  '/equipment/complete': typeof EquipmentCompleteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
-  '/equipment/complete': typeof EquipmentCompleteRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pending': typeof PendingRoute
+  '/pricing-terms': typeof PricingTermsRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
+  '/equipment/complete': typeof EquipmentCompleteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRoute
-  '/equipment/complete': typeof EquipmentCompleteRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/pending': typeof PendingRoute
+  '/pricing-terms': typeof PricingTermsRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/register': typeof RegisterRoute
+  '/terms': typeof TermsRoute
   '/verification': typeof VerificationRoute
+  '/equipment/complete': typeof EquipmentCompleteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/contact'
     | '/dashboard'
-    | '/equipment/complete'
+    | '/legal'
     | '/login'
     | '/pending'
+    | '/pricing-terms'
+    | '/privacy'
+    | '/refund-policy'
     | '/register'
+    | '/terms'
     | '/verification'
+    | '/equipment/complete'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/contact'
     | '/dashboard'
-    | '/equipment/complete'
+    | '/legal'
     | '/login'
     | '/pending'
+    | '/pricing-terms'
+    | '/privacy'
+    | '/refund-policy'
     | '/register'
+    | '/terms'
     | '/verification'
+    | '/equipment/complete'
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/contact'
     | '/dashboard'
-    | '/equipment/complete'
+    | '/legal'
     | '/login'
     | '/pending'
+    | '/pricing-terms'
+    | '/privacy'
+    | '/refund-policy'
     | '/register'
+    | '/terms'
     | '/verification'
+    | '/equipment/complete'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRoute
-  EquipmentCompleteRoute: typeof EquipmentCompleteRoute
+  LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   PendingRoute: typeof PendingRoute
+  PricingTermsRoute: typeof PricingTermsRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   RegisterRoute: typeof RegisterRoute
+  TermsRoute: typeof TermsRoute
   VerificationRoute: typeof VerificationRoute
+  EquipmentCompleteRoute: typeof EquipmentCompleteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -130,6 +221,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -137,11 +242,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/equipment/complete': {
-      id: '/equipment/complete'
-      path: '/equipment/complete'
-      fullPath: '/equipment/complete'
-      preLoaderRoute: typeof EquipmentCompleteRouteImport
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -158,11 +263,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PendingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pricing-terms': {
+      id: '/pricing-terms'
+      path: '/pricing-terms'
+      fullPath: '/pricing-terms'
+      preLoaderRoute: typeof PricingTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verification': {
@@ -172,17 +305,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/equipment/complete': {
+      id: '/equipment/complete'
+      path: '/equipment/complete'
+      fullPath: '/equipment/complete'
+      preLoaderRoute: typeof EquipmentCompleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ContactRoute: ContactRoute,
   DashboardRoute: DashboardRoute,
-  EquipmentCompleteRoute: EquipmentCompleteRoute,
+  LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   PendingRoute: PendingRoute,
+  PricingTermsRoute: PricingTermsRoute,
+  PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   RegisterRoute: RegisterRoute,
+  TermsRoute: TermsRoute,
   VerificationRoute: VerificationRoute,
+  EquipmentCompleteRoute: EquipmentCompleteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

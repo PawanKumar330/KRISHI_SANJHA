@@ -225,6 +225,77 @@ function Home() {
         </div>
       </section>
 
+      {/* Zoho Payments & Trust Compliance Section */}
+      <section className="bg-white py-16 px-4 md:px-8 border-b border-[#c2c8c1]/40">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1f3d2b]/10 text-[#082717] text-xs font-semibold tracking-wide border border-[#1f3d2b]/20 mb-3">
+              🛡️ Payment Security & Reliability
+            </span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#082717] mb-3">
+              Transparent Pricing & Safe Agricultural Transactions
+            </h2>
+            <p className="text-sm sm:text-base text-[#424843]">
+              Operating as <strong>Krishi Sanjha Technologies Pvt. Ltd.</strong>, we ensure 100% security for farmers and equipment owners via <strong>Zoho Payments</strong>.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-[#FAF7F1] p-6 rounded-2xl border border-[#c2c8c1]/40 flex flex-col items-center text-center">
+              <span className="material-symbols-outlined text-[#7b5800] text-4xl mb-3">
+                currency_rupee
+              </span>
+              <h3 className="font-bold text-[#082717] text-base mb-1.5">Indian Rupee (₹ - INR)</h3>
+              <p className="text-xs text-[#424843] leading-relaxed">
+                All prices are explicitly listed in INR with no hidden currency fees or sudden surcharges.
+              </p>
+              <Link to="/pricing-terms" className="mt-3 text-xs font-semibold text-[#7b5800] hover:underline">
+                View Pricing Terms &rarr;
+              </Link>
+            </div>
+
+            <div className="bg-[#FAF7F1] p-6 rounded-2xl border border-[#c2c8c1]/40 flex flex-col items-center text-center">
+              <span className="material-symbols-outlined text-[#1f3d2b] text-4xl mb-3">
+                verified_user
+              </span>
+              <h3 className="font-bold text-[#082717] text-base mb-1.5">Zoho Payments Gateway</h3>
+              <p className="text-xs text-[#424843] leading-relaxed">
+                PCI-DSS Level 1 compliant secure checkout supporting UPI, Debit/Credit Cards & Net Banking.
+              </p>
+              <Link to="/privacy" className="mt-3 text-xs font-semibold text-[#1f3d2b] hover:underline">
+                Security Standards &rarr;
+              </Link>
+            </div>
+
+            <div className="bg-[#FAF7F1] p-6 rounded-2xl border border-[#c2c8c1]/40 flex flex-col items-center text-center">
+              <span className="material-symbols-outlined text-[#7b5800] text-4xl mb-3">
+                restart_alt
+              </span>
+              <h3 className="font-bold text-[#082717] text-base mb-1.5">Guaranteed Replacement</h3>
+              <p className="text-xs text-[#424843] leading-relaxed">
+                Machinery breakdown during field work is replaced from the nearest hub within 2 to 4 hours.
+              </p>
+              <Link to="/refund-policy" className="mt-3 text-xs font-semibold text-[#7b5800] hover:underline">
+                Replacement Policy &rarr;
+              </Link>
+            </div>
+
+            <div className="bg-[#FAF7F1] p-6 rounded-2xl border border-[#c2c8c1]/40 flex flex-col items-center text-center">
+              <span className="material-symbols-outlined text-[#082717] text-4xl mb-3">
+                credit_card_clock
+              </span>
+              <h3 className="font-bold text-[#082717] text-base mb-1.5">Fast Refunds (5-7 Days)</h3>
+              <p className="text-xs text-[#424843] leading-relaxed">
+                100% refunds on eligible cancellations credited directly to your original payment method.
+              </p>
+              <Link to="/refund-policy" className="mt-3 text-xs font-semibold text-[#082717] hover:underline">
+                Refund Details &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-4 md:px-8 max-w-6xl mx-auto text-center">
         <div className="bg-[#ffcd6d] rounded-3xl p-10 md:p-20 shadow-md relative overflow-hidden">

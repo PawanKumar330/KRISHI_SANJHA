@@ -77,14 +77,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Krishi Sanjha - Agricultural Machinery Sharing & Rental Marketplace" },
+      {
+        name: "description",
+        content:
+          "Krishi Sanjha Technologies Pvt. Ltd. - Verified farm equipment rental and custom hiring marketplace connecting farmers with machinery owners and operators in Bihar, India.",
+      },
+      { name: "author", content: "Krishi Sanjha Technologies Private Limited" },
+      { property: "og:title", content: "Krishi Sanjha - Farm Equipment Sharing Marketplace" },
+      {
+        property: "og:description",
+        content:
+          "Access tractors, harvesters, rotavators, and certified operators with transparent pricing in INR and secure payments.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {

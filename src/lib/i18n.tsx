@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 
 export type Lang = "en" | "hi";
 
@@ -166,6 +166,22 @@ const DICT = {
   callOwner: { en: "Call", hi: "कॉल करें" },
   noOwnersNearby: { en: "No approved equipment owners found within 100 km yet.", hi: "100 किमी के भीतर अभी कोई स्वीकृत यंत्र मालिक नहीं मिला।" },
   rpcMissing: { en: "Nearest-owner matching isn't active yet. Run supabase/nearby_owners_rpc.sql in the Supabase SQL editor.", hi: "नज़दीकी मालिक सुविधा अभी सक्रिय नहीं है। Supabase SQL एडिटर में supabase/nearby_owners_rpc.sql चलाएँ।" },
+  aboutUs: { en: "About Us", hi: "हमारे बारे में" },
+  contactUs: { en: "Contact Us", hi: "संपर्क करें" },
+  cancellationRefundPolicy: { en: "Cancellation & Refund Policy", hi: "रद्दीकरण एवं रिफंड नीति" },
+  replacementPolicy: { en: "Return & Replacement Policy", hi: "वापसी एवं प्रतिस्थापन नीति" },
+  pricingPaymentTerms: { en: "Pricing & Payment Terms", hi: "मूल्य एवं भुगतान शर्तें" },
+  legalDisclosures: { en: "Legal & Regulatory Compliance", hi: "कानूनी व विनियामक अनुपालन" },
+  currencyDeclaration: { en: "All transactions processed in Indian Rupees (₹ - INR)", hi: "सभी लेनदेन भारतीय रुपये (₹ - INR) में किए जाते हैं" },
+  registeredEntity: { en: "Krishi Sanjha Technologies Pvt. Ltd.", hi: "कृषि सांझा टेक्नोलॉजीज प्राइवेट लिमिटेड" },
+  registeredOffice: { en: "Registered Office", hi: "पंजीकृत कार्यालय" },
+  grievanceOfficer: { en: "Grievance Officer", hi: "शिकायत निवारण अधिकारी" },
+  supportHours: { en: "Mon - Sat: 8:00 AM - 8:00 PM IST", hi: "सोमवार - शनिवार: प्रातः 8:00 से रात्रि 8:00 बजे तक" },
+  helpline: { en: "Customer Helpline", hi: "ग्राहक हेल्पलाइन" },
+  emailSupport: { en: "Email Support", hi: "ईमेल सहायता" },
+  quickLinks: { en: "Quick Links", hi: "त्वरित लिंक" },
+  trustAndSafety: { en: "Trust & Safety", hi: "विश्वास और सुरक्षा" },
+  securePayments: { en: "100% Secure Payments via Zoho Payments", hi: "जोहो पेमेंट्स द्वारा 100% सुरक्षित भुगतान" },
 } as const;
 
 export type TKey = keyof typeof DICT;
