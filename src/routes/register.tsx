@@ -216,8 +216,12 @@ function RegisterPage() {
               sub_category: equipment.tractor_make || undefined,
               make_model: equipment.make_model,
               hp_rating: equipment.hp_rating ? Number(equipment.hp_rating) : undefined,
+              fuel_type: equipment.fuel_type || undefined,
+              reg_number: equipment.reg_number || undefined,
               hourly_rate: equipment.hourly_rate ? Number(equipment.hourly_rate) : undefined,
               acre_rate: equipment.acre_rate ? Number(equipment.acre_rate) : undefined,
+              transport_available: equipment.transport_available,
+              has_insurance: equipment.has_insurance,
             }
           : undefined,
       operator:

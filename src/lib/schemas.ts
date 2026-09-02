@@ -48,15 +48,19 @@ export const registerSchema = z
       .regex(/^\d{4}$/, "Enter exactly 4 digits")
       .optional()
       .or(z.literal("")),
-    equipment: z
+       equipment: z
       .object({
         category: z.string().min(1, "Select a category"),
         sub_category: z.string().optional().or(z.literal("")),
         make_model: z.string().trim().min(2, "Make / model is required").max(120),
         hp_rating: z.coerce.number().min(0).max(1000).optional(),
+        fuel_type: z.string().optional().or(z.literal("")),
+        reg_number: z.string().optional().or(z.literal("")),
         hourly_rate: z.coerce.number().min(0).max(100000).optional(),
         acre_rate: z.coerce.number().min(0).max(100000).optional(),
         implements: z.array(z.string()).optional(),
+        transport_available: z.boolean().optional(),
+        has_insurance: z.boolean().optional(),
       })
       .optional()
       .nullable(),

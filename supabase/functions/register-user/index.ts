@@ -108,9 +108,16 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Role-specific rows. If either of these fails, we don't roll back the
+    // whole registration (the profile itself is valid) — we just report the
+    // partial failure so the frontend can inform the user, since they can
+    // always add/edit equipment or operator details later from their profile.
     let roleDataWarning: string | null = null;
 
     if (role === "EQUIPMENT_OWNER" && equipment) {
+      // A CHC enterprise row is required as the parent for equipment listings
+      // per the schema. Auto-create a minimal one using the owner's own name
+      // if they haven't set up a formal business yet — they can rename it later.
       const { data: chc, error: chcError } = await admin
         .from("chc_enterprises")
         .insert({
@@ -131,10 +138,14 @@ Deno.serve(async (req) => {
           sub_category: equipment.sub_category || null,
           make_model: equipment.make_model,
           hp_rating: equipment.hp_rating ?? null,
+          fuel_type: equipment.fuel_type || null,
+          reg_number: equipment.reg_number || null,
           hourly_rate: equipment.hourly_rate ?? null,
           acre_rate: equipment.acre_rate ?? null,
           implements: equipment.implements ?? [],
-          is_active: false,
+          transport_available: equipment.transport_available ?? false,
+          has_insurance: equipment.has_insurance ?? false,
+          is_active: false, // stays inactive until the profile itself is approved
         });
         if (eqError) {
           roleDataWarning = `Profile created, but equipment setup failed: ${eqError.message}`;

@@ -22,14 +22,18 @@ export interface RegisterInput {
   phone: string;
   father_name?: string | null;
   aadhaar_last4?: string | null;
-  equipment?: {
+   equipment?: {
     category: string;
     sub_category?: string;
     make_model: string;
     hp_rating?: number;
+    fuel_type?: string;
+    reg_number?: string;
     hourly_rate?: number;
     acre_rate?: number;
     implements?: string[];
+    transport_available?: boolean;
+    has_insurance?: boolean;
   } | null;
   operator?: {
     driving_license_no: string;
