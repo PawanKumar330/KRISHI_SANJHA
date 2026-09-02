@@ -245,6 +245,60 @@ export const api = {
     return (data ?? []).map(rowToAppUser);
   },
 
+  /**
+   * Returns all applicant profiles within the signed-in admin's jurisdiction.
+   * RLS automatically filters rows to the admin's scope (Village Admin -> Panchayat,
+   * Block Admin -> Block, District Admin -> District).
+   */
+  adminHistory: async (): Promise<AppUser[]> => {
+    if (OFFLINE_MODE) {
+      const token = readToken();
+      if (!token) throw new ApiError(401, "Please sign in again");
+      return mockCall((m) => m.audit(token));
+    }
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .order("submitted_at", { ascending: false });
+    if (error) throw new ApiError(0, error.message);
+    return (data ?? []).map(rowToAppUser);
+  },
+
+  /**
+   * Fetches equipment, enterprise, and land plot details for a specific applicant.
+   */
+  applicantDetails: async (userId: string): Promise<{
+    equipment: Record<string, any> | null;
+    enterprise: Record<string, any> | null;
+    landPlots: LandPlot[];
+  }> => {
+    if (OFFLINE_MODE) {
+      return { equipment: null, enterprise: null, landPlots: [] };
+    }
+
+    const [eqRes, entRes, landRes] = await Promise.all([
+      supabase.from("equipment").select("*").eq("owner_id", userId).maybeSingle(),
+      supabase.from("chc_enterprises").select("*").eq("owner_id", userId).maybeSingle(),
+      supabase.from("land_records").select("*").eq("user_id", userId),
+    ]);
+
+    return {
+      equipment: eqRes.data ?? null,
+      enterprise: entRes.data ?? null,
+      landPlots: (landRes.data ?? []).map((row: any) => ({
+        id: row.id,
+        plot_name: row.plot_name ?? "",
+        bigha: Number(row.land_area_bigha ?? 0),
+        katha: Number(row.land_area_katha ?? 0),
+        dhur: 0,
+        soil_type: row.soil_type ?? "",
+        latitude: row.latitude,
+        longitude: row.longitude,
+      })),
+    };
+  },
+
   saveProfile: async (payload: Record<string, unknown>): Promise<{ ok: true }> => {
     if (OFFLINE_MODE) return mockCall(() => ({ ok: true as const }));
 
