@@ -287,7 +287,7 @@ function CompleteEquipmentPage() {
           business_name: enterpriseForm.business_name.trim(),
           registration_number: enterpriseForm.registration_number.trim() || undefined,
           gst_number: enterpriseForm.gst_number.trim() || undefined,
-          village_id: loc.village_id ?? undefined,
+          village_id: loc.village_id ? Number(loc.village_id) : undefined,
           latitude: coords?.lat ?? undefined,
           longitude: coords?.lng ?? undefined,
         },
